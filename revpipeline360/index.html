@@ -1,1 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>RevPipeline360 — Microsoft Fabric Lakehouse Build</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.6.1/mermaid.min.js"></script>
+  <style>
+    :root {
+      --bg: #070b12;
+      --surface: #0d1520;
+      --surface2: #111d2e;
+      --border: #1a2d45;
+      --text: #e8edf5;
+      --muted: #6b7e96;
+      --accent: #0ea5e9;
+      --accent2: #38bdf8;
+      --gold: #f59e0b;
+      --green: #10b981;
+      --purple: #8b5cf6;
+      --radius: 12px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; font-weight: 300; line-height: 1.7; min-height: 100vh; }
 
+    /* ── Header ── */
+    header {
+      position: relative; padding: 80px 48px 100px; overflow: hidden;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+    }
+    header::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 60% -10%, rgba(14,165,233,.18) 0%, transparent 65%),
+                  radial-gradient(ellipse 40% 40% at 90% 80%, rgba(139,92,246,.12) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .grid-bg {
+      position: absolute; inset: 0; pointer-events: none; opacity: .04;
+      background-image: linear-gradient(var(--accent) 1px, transparent 1px),
+                        linear-gradient(90deg, var(--accent) 1px, transparent 1px);
+      background-size: 48px 48px;
+    }
+    .eyebrow {
+      font-family: 'JetBrains Mono', monospace; font-size: 11px;
+      letter-spacing: .22em; text-transform: uppercase; color: var(--accent);
+      margin-bottom: 20px; display: flex; align-items: center; gap: 12px;
+    }
+    .eyebrow::before { content: ''; width: 32px; height: 1px; background: var(--accent); display: inline-block; }
+    h1 {
+      font-family: 'Syne', sans-serif; font-size: clamp(32px, 5vw, 60px);
+      font-weight: 800; line-height: 1.05; max-width: 800px; margin-bottom: 20px; color: var(--text);
+      position: relative;
+    }
+    h1 span { color: var(--accent); }
+    h1 em { font-style: normal; color: var(--gold); }
+    .hdesc { color: var(--muted); max-width: 620px; font-size: 15px; margin-top: 10px; position: relative; }
+    .meta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 32px; position: relative; }
+    .tag {
+      background: rgba(14,165,233,.08); border: 1px solid rgba(14,165,233,.2);
+      color: var(--accent2); font-size: 12px; font-family: 'JetBrains Mono', monospace;
+      padding: 4px 12px; border-radius: 4px; letter-spacing: .04em;
+    }
+    .tag.gold { background: rgba(245,158,11,.08); border-color: rgba(245,158,11,.25); color: var(--gold); }
+    .tag.purple { background: rgba(139,92,246,.08); border-color: rgba(139,92,246,.25); color: #a78bfa; }
+
+    /* ── Nav ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(7,11,18,.95); backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border); padding: 0 48px;
+      display: flex; gap: 4px; overflow-x: auto;
+    }
+    nav a {
+      display: inline-block; padding: 14px 16px; font-size: 13px; font-weight: 500;
+      color: var(--muted); text-decoration: none; border-bottom: 2px solid transparent;
+      white-space: nowrap; transition: color .2s, border-color .2s;
+    }
+    nav a:hover { color: var(--text); border-color: var(--border); }
+    nav a.active { color: var(--accent); border-color: var(--accent); }
+
+    /* ── Main ── */
+    main { max-width: 1140px; margin: 0 auto; padding: 0 48px 96px; }
+    section { padding-top: 72px; border-top: 1px solid var(--border); margin-top: 72px; }
+    section:first-child { border-top: none; }
+    .lbl {
+      font-family: 'JetBrains Mono', monospace; font-size: 10px;
+      letter-spacing: .28em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px;
+    }
+    h2 { font-family: 'Syne', sans-serif; font-size: clamp(24px, 3vw, 38px); font-weight: 700; margin-bottom: 36px; color: var(--text); }
+
+    /* ── Impact Banner ── */
+    .impact {
+      background: linear-gradient(135deg, #0d1a2e 0%, #091524 100%);
+      border: 1px solid rgba(14,165,233,.2); border-radius: var(--radius);
+      padding: 36px 44px; margin-bottom: 44px;
+      display: flex; align-items: center; gap: 36px; flex-wrap: wrap;
+      position: relative; overflow: hidden;
+    }
+    .impact::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    }
+    .impact-num { font-family: 'Syne', sans-serif; font-size: 56px; font-weight: 800; color: var(--accent); line-height: 1; flex-shrink: 0; }
+    .impact-text h3 { font-size: 17px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+    .impact-text p { font-size: 14px; color: var(--muted); max-width: 540px; }
+
+    /* ── KPI Strip ── */
+    .kpi-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-bottom: 44px; }
+    .kpi {
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 20px 24px; transition: border-color .2s, transform .2s;
+    }
+    .kpi:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .kpi-val { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 800; color: var(--accent); }
+    .kpi-val.gold { color: var(--gold); }
+    .kpi-val.green { color: var(--green); }
+    .kpi-val.purple { color: var(--purple); }
+    .kpi-lbl { font-size: 11px; font-family: 'JetBrains Mono', monospace; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; margin-top: 4px; }
+
+    /* ── Layer Cards ── */
+    .layers { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 40px; }
+    .layer-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 24px; transition: border-color .2s, transform .2s; position: relative; overflow: hidden;
+    }
+    .layer-card::after {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    }
+    .layer-card.bronze::after { background: linear-gradient(90deg, #cd7f32, #e8a87c); }
+    .layer-card.silver::after { background: linear-gradient(90deg, #9ca3af, #e5e7eb); }
+    .layer-card.gold::after { background: linear-gradient(90deg, #f59e0b, #fcd34d); }
+    .layer-card.model::after { background: linear-gradient(90deg, var(--accent), var(--accent2)); }
+    .layer-card.report::after { background: linear-gradient(90deg, var(--purple), #c4b5fd); }
+    .layer-card:hover { border-color: var(--border); transform: translateY(-2px); }
+    .lc-badge {
+      font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: .2em;
+      text-transform: uppercase; padding: 3px 8px; border-radius: 3px; margin-bottom: 12px; display: inline-block;
+    }
+    .bronze .lc-badge { background: rgba(205,127,50,.15); color: #e8a87c; }
+    .silver .lc-badge { background: rgba(156,163,175,.15); color: #d1d5db; }
+    .gold .lc-badge { background: rgba(245,158,11,.15); color: var(--gold); }
+    .model .lc-badge { background: rgba(14,165,233,.15); color: var(--accent2); }
+    .report .lc-badge { background: rgba(139,92,246,.15); color: #a78bfa; }
+    .lc-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+    .lc-desc { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+    /* ── Doc ── */
+    .doc { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 40px 48px; font-size: 15px; line-height: 1.8; }
+    .doc h3 { font-family: 'Syne', sans-serif; font-size: 19px; font-weight: 700; color: var(--text); margin: 32px 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+    .doc h3:first-child { margin-top: 0; }
+    .doc p { color: #94a3b8; margin-bottom: 14px; }
+    .doc ul { padding-left: 24px; margin-bottom: 14px; }
+    .doc li { color: #94a3b8; margin-bottom: 6px; }
+    .doc li::marker { color: var(--accent); }
+    .doc strong { color: var(--text); font-weight: 600; }
+    .doc code { font-family: 'JetBrains Mono', monospace; font-size: 13px; background: var(--surface2); padding: 2px 7px; border-radius: 4px; color: var(--accent2); }
+    .doc table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px; }
+    .doc th { background: var(--surface2); text-align: left; padding: 10px 14px; color: var(--muted); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; font-weight: 600; border-bottom: 1px solid var(--border); }
+    .doc td { padding: 10px 14px; border-bottom: 1px solid var(--border); color: #94a3b8; vertical-align: top; }
+    .doc tr:last-child td { border-bottom: none; }
+
+    /* ── PDF ── */
+    .pdf-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+    .pdf-bar { background: var(--surface2); border-bottom: 1px solid var(--border); padding: 12px 20px; display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); }
+    .pdf-bar span { font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .r { background: #ff5f57; } .y { background: #febc2e; } .g { background: #28c840; }
+    .pdf-frame { width: 100%; height: 700px; border: none; display: block; }
+
+    /* ── Image Gallery ── */
+    .ig { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
+    .ig-wide { grid-template-columns: 1fr; }
+    .ic {
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+      overflow: hidden; transition: border-color .2s, transform .2s;
+    }
+    .ic:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .ic img { width: 100%; display: block; cursor: zoom-in; }
+    .icap { padding: 12px 16px; font-size: 12px; color: var(--muted); font-family: 'JetBrains Mono', monospace; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
+    .icap-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+
+    /* ── Mermaid ── */
+    .mwrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 40px; overflow-x: auto; }
+    .mermaid { display: flex; justify-content: center; }
+
+    /* ── Checklist ── */
+    .cl { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+    .cl li {
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 14px 18px; font-size: 14px; color: #94a3b8;
+      display: flex; align-items: flex-start; gap: 12px; transition: border-color .2s;
+    }
+    .cl li:hover { border-color: var(--accent); }
+    .chi { color: var(--accent); font-size: 14px; flex-shrink: 0; margin-top: 3px; font-family: 'JetBrains Mono', monospace; }
+
+    /* ── Lightbox ── */
+    #lb { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.94); z-index: 1000; justify-content: center; align-items: center; padding: 24px; cursor: zoom-out; }
+    #lb.open { display: flex; }
+    #lb img { max-width: 100%; max-height: 90vh; border-radius: 8px; box-shadow: 0 24px 80px rgba(0,0,0,.8); }
+
+    footer { border-top: 1px solid var(--border); padding: 28px 48px; text-align: center; font-size: 12px; color: var(--muted); font-family: 'JetBrains Mono', monospace; letter-spacing: .05em; }
+    @media(max-width:640px) { header, main, nav, footer { padding-left: 20px; padding-right: 20px; } .doc { padding: 24px 20px; } .pdf-frame { height: 500px; } .impact { padding: 24px; } .impact-num { font-size: 40px; } }
+    @keyframes fu { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    header { animation: fu .6s ease both; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="grid-bg"></div>
+  <div class="eyebrow">Case Study &mdash; Data Engineering &amp; Analytics</div>
+  <h1>RevPipeline<span>360</span><br/><em>Fabric Lakehouse Build</em></h1>
+  <p class="hdesc">An end-to-end Microsoft Fabric analytics pipeline — Bronze/Silver/Gold medallion architecture, PySpark notebook transforms, Direct Lake semantic model, and a Power BI Revenue Intelligence dashboard.</p>
+  <div class="meta">
+    <span class="tag gold">Microsoft Fabric</span>
+    <span class="tag gold">OneLake</span>
+    <span class="tag">PySpark / SQL</span>
+    <span class="tag">Direct Lake</span>
+    <span class="tag purple">Power BI</span>
+    <span class="tag">DAX</span>
+    <span class="tag">Star Schema</span>
+    <span class="tag">Dataflow Gen2</span>
+  </div>
+</header>
+
+<nav id="nav">
+  <a href="#overview" class="active">Overview</a>
+  <a href="#architecture">Architecture</a>
+  <a href="#documentation">Documentation</a>
+  <a href="#pdf">Full PDF</a>
+  <a href="#visuals">Visuals</a>
+  <a href="#diagram">Flow Diagram</a>
+  <a href="#checklist">Checklist</a>
+</nav>
+
+<main>
+
+  <!-- ── 01 Overview ─────────────────────────────────────────────── -->
+  <section id="overview">
+    <div class="lbl">01 &mdash; Overview</div>
+    <h2>System at a Glance</h2>
+
+    <div class="impact">
+      <div class="impact-num">9</div>
+      <div class="impact-text">
+        <h3>Gold Fact &amp; Dimension Tables — Full Star Schema</h3>
+        <p>5 dimensions + 9 fact tables built via PySpark notebooks on a Bronze/Silver/Gold medallion lakehouse, feeding a Direct Lake semantic model with full DAX measure library and a live Power BI Revenue Intelligence report.</p>
+      </div>
+    </div>
+
+    <div class="kpi-strip">
+      <div class="kpi"><div class="kpi-val">1,200</div><div class="kpi-lbl">Total Leads</div></div>
+      <div class="kpi"><div class="kpi-val gold">27%</div><div class="kpi-lbl">Lead Conversion Rate</div></div>
+      <div class="kpi"><div class="kpi-val green">82%</div><div class="kpi-lbl">Win Rate (Lead-Sourced)</div></div>
+      <div class="kpi"><div class="kpi-val">$78K</div><div class="kpi-lbl">Pipeline Amount</div></div>
+      <div class="kpi"><div class="kpi-val purple">14</div><div class="kpi-lbl">Dataflow Gen2 Queries</div></div>
+      <div class="kpi"><div class="kpi-val gold">3</div><div class="kpi-lbl">Medallion Layers</div></div>
+    </div>
+
+    <div class="layers">
+      <div class="layer-card bronze">
+        <span class="lc-badge">Bronze</span>
+        <div class="lc-title">Raw Landing</div>
+        <div class="lc-desc">OneDrive CSV ingestion via Dataflow Gen2. 1:1 with source files. 10+ bronze tables including customers, campaigns, leads, opportunities, invoices, GL postings, budget, headcount.</div>
+      </div>
+      <div class="layer-card silver">
+        <span class="lc-badge">Silver</span>
+        <div class="lc-title">Cleaned &amp; Typed</div>
+        <div class="lc-desc">NB_Silver_Transform notebook. TRIM, CAST, NULLIF, date normalization. Standardized column names and types. Validated with row count checks across all tables.</div>
+      </div>
+      <div class="layer-card gold">
+        <span class="lc-badge">Gold</span>
+        <div class="lc-title">Curated Star Schema</div>
+        <div class="lc-desc">NB_Gold_Transform notebook. Dims: date, customers, products, users, campaigns. Facts: opportunity, opportunity line, leads, campaigns, invoice header/line, GL postings, budget, headcount.</div>
+      </div>
+      <div class="layer-card model">
+        <span class="lc-badge">Semantic Model</span>
+        <div class="lc-title">Direct Lake</div>
+        <div class="lc-desc">SM_RevPipeline360 with active/inactive relationships, USERELATIONSHIP and TREATAS for attribution. Full DAX measure library under MyMeasures table.</div>
+      </div>
+      <div class="layer-card report">
+        <span class="lc-badge">Power BI</span>
+        <div class="lc-title">Revenue Intelligence</div>
+        <div class="lc-desc">RevDashboardV4 — Campaign to Revenue page. FY slicer, lead funnel, channel attribution, campaign effectiveness scatter, top campaigns bar chart.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 02 Architecture ────────────────────────────────────────── -->
+  <section id="architecture">
+    <div class="lbl">02 &mdash; Architecture</div>
+    <h2>Technical Architecture</h2>
+    <div class="doc">
+      <h3>Workspace &amp; Assets</h3>
+      <table>
+        <thead><tr><th>Asset</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>WS_RevPipeline360_Lab</code></td><td>Workspace</td><td>Primary Fabric workspace containing all build assets</td></tr>
+          <tr><td><code>LH_RevPipeline360</code></td><td>Lakehouse</td><td>OneLake storage — Bronze / Silver / Gold dbo schema</td></tr>
+          <tr><td><code>NB_Silver_Transform</code></td><td>Notebook</td><td>PySpark/SQL: cleanse Bronze into Silver (trim, cast, normalize)</td></tr>
+          <tr><td><code>NB_Gold_Transform</code></td><td>Notebook</td><td>PySpark/SQL: build star schema Gold dims and facts</td></tr>
+          <tr><td><code>PL_RevPipeline360_Refresh</code></td><td>Pipeline</td><td>Orchestration: Run_NB_Silver → (On Success) → Run_NB_Gold</td></tr>
+          <tr><td><code>SM_RevPipeline360</code></td><td>Semantic Model</td><td>Direct Lake — relationships, DAX measures, role security</td></tr>
+          <tr><td><code>RevDashboardV4</code></td><td>Power BI Report</td><td>Revenue Intelligence: Campaign to Revenue page</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Gold Schema — Dimensions</h3>
+      <ul>
+        <li><strong>gold_dim_date</strong> — date_key, calendar_date, year, month, quarter, week, fiscal_year, fiscal_month</li>
+        <li><strong>gold_dim_customers</strong> — master_customer_id (PK), customer_name, industry, region, active_flag</li>
+        <li><strong>gold_dim_products</strong> — master_sku (PK), product_name, product_family, category, uom</li>
+        <li><strong>gold_dim_users</strong> — salesrep_id (PK), rep_name, manager, territory, region</li>
+        <li><strong>gold_dim_campaigns</strong> — campaign_id (PK), campaign_name, channel, start_date/end_date + date_keys</li>
+      </ul>
+
+      <h3>Gold Schema — Facts</h3>
+      <ul>
+        <li><strong>gold_fact_opportunity</strong> — opportunity_id, customer_id, salesrep_id, stage, is_closed, is_won, amount, close_date_key, created_date_key</li>
+        <li><strong>gold_fact_opportunity_line</strong> — line items joined to opportunity and products (product_sku, quantity, unit_price, discount_pct, line_amount)</li>
+        <li><strong>gold_fact_leads</strong> — lead_id, lead_source, campaign_id, created_date_key, converted_to_opportunity_id</li>
+        <li><strong>gold_fact_campaigns</strong> — campaign activity fact bridging campaigns dim to lead funnel</li>
+        <li><strong>gold_fact_invoice_header</strong> — invoice_id, opportunity_id, customer_id, invoice_date_key, due_date_key, status</li>
+        <li><strong>gold_fact_invoice_line</strong> — line-level invoice detail with product and customer enrichment</li>
+        <li><strong>gold_fact_gl_postings</strong> — posting_date_key, customer_id, account_code, account_type, amount</li>
+        <li><strong>gold_fact_budget_monthly</strong> — month_date_key, region, budget_revenue, budget_cogs, budget_gross_profit, budget_gm_pct</li>
+        <li><strong>gold_fact_headcount_monthly</strong> — month_date_key, region, headcount, hires, attrition, attrition_rate</li>
+      </ul>
+
+      <h3>Relationship Design</h3>
+      <ul>
+        <li><strong>Active paths:</strong> gold_dim_date → fact tables via primary date key per fact (e.g., close_date_key for opportunity, invoice_date_key for invoice line)</li>
+        <li><strong>Inactive relationships:</strong> created_date_key, due_date_key, campaign start/end date keys — activated via <code>USERELATIONSHIP</code> in DAX where needed</li>
+        <li><strong>Attribution pattern:</strong> campaign → lead → opportunity linked via <code>TREATAS</code> on <code>converted_to_opportunity_id</code> to avoid ambiguous active paths</li>
+        <li><strong>Pipeline hardening:</strong> retries + timeouts on notebook activities to handle Spark/Livy session throttling (HTTP 430)</li>
+      </ul>
+
+      <h3>Key DAX Measures</h3>
+      <table>
+        <thead><tr><th>Measure</th><th>Logic</th></tr></thead>
+        <tbody>
+          <tr><td><code>Leads</code></td><td>COUNTROWS(gold_fact_leads)</td></tr>
+          <tr><td><code>Won Opportunities</code></td><td>CALCULATE([Opportunities], is_won = 1)</td></tr>
+          <tr><td><code>Win Rate</code></td><td>DIVIDE([Won Opportunities], [Opportunities], 0)</td></tr>
+          <tr><td><code>Lead Conversion Rate</code></td><td>DIVIDE([Converted Leads], [Leads])</td></tr>
+          <tr><td><code>Pipeline Amount (By Channel)</code></td><td>TREATAS attribution via converted_to_opportunity_id</td></tr>
+          <tr><td><code>Active Campaigns (FY)</code></td><td>FY overlap window using SELECTEDVALUE + date boundary filter</td></tr>
+          <tr><td><code>Pipeline Amount (Attributed)</code></td><td>USERELATIONSHIP on lead → opportunity inactive path</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── 03 Documentation ───────────────────────────────────────── -->
+  <section id="documentation">
+    <div class="lbl">03 &mdash; Documentation</div>
+    <h2>Build Notes &amp; Design Decisions</h2>
+    <div class="doc">
+      <h3>Medallion ELT Pattern</h3>
+      <p>All transforms run inside Fabric via PySpark notebooks using <code>spark.sql()</code> with <code>CREATE OR REPLACE TABLE</code> statements. This ensures idempotent rebuilds — re-running any notebook fully refreshes the layer without manual cleanup. Silver focuses exclusively on data quality (types, nulls, trimming); Gold focuses exclusively on business logic (joins, date key enrichment, derived metrics).</p>
+
+      <h3>Campaign Date Key Enhancement</h3>
+      <p>The <code>gold_dim_campaigns</code> table was enhanced with both <code>start_date_key</code> and <code>end_date_key</code> by joining to <code>gold_dim_date</code> twice during Gold build. This enables fiscal year overlap slicing for the Active Campaigns (FY) measure without requiring a bridge table.</p>
+
+      <h3>Ambiguous Relationship Resolution</h3>
+      <p>Several fact tables (opportunity, invoice header) have multiple date foreign keys pointing to <code>gold_dim_date</code>. Only one relationship per fact table is set active (the primary analytical date). Alternate date roles are activated in DAX measures using <code>USERELATIONSHIP</code>. For campaign-to-opportunity attribution where no direct foreign key exists, <code>TREATAS</code> is used to project the filtered opportunity set from lead conversion data.</p>
+
+      <h3>Pipeline Governance</h3>
+      <p>The <code>PL_RevPipeline360_Refresh</code> pipeline uses On Success chaining between Silver and Gold notebook activities. Retry policies and timeout settings were added after intermittent Spark/Livy session throttling (HTTP 430) was observed during early runs on shared capacity. Interactive notebook sessions should not run in parallel with pipeline execution.</p>
+    </div>
+  </section>
+
+  <!-- ── 04 PDF ─────────────────────────────────────────────────── -->
+  <section id="pdf">
+    <div class="lbl">04 &mdash; Full Document</div>
+    <h2>Architecture PDF</h2>
+    <div class="pdf-wrap">
+      <div class="pdf-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><span>RevPipeline360_Fabric_Build_Architecture.pdf</span></div>
+      <iframe class="pdf-frame" src="RevPipeline360_Fabric_Build_Architecture.pdf#toolbar=0&navpanes=0&scrollbar=1&view=FitH" title="RevPipeline360 Architecture"></iframe>
+    </div>
+  </section>
+
+  <!-- ── 05 Visuals ─────────────────────────────────────────────── -->
+  <section id="visuals">
+    <div class="lbl">05 &mdash; Visual Artifacts</div>
+    <h2>Build Screenshots</h2>
+
+    <!-- Dashboard full width -->
+    <div class="ig ig-wide" style="margin-bottom:20px;">
+      <div class="ic">
+        <img src="Revpipeline_Dashboard.png" alt="Revenue Intelligence Dashboard" onclick="openLb(this.src)"/>
+        <div class="icap"><span class="icap-dot"></span>Revpipeline_Dashboard.png &mdash; Revenue Intelligence: Campaign to Revenue Dashboard</div>
+      </div>
+    </div>
+
+    <!-- 2-col grid -->
+    <div class="ig" style="margin-bottom:20px;">
+      <div class="ic">
+        <img src="Revpipeline_SemanticModel.png" alt="Direct Lake Semantic Model" onclick="openLb(this.src)"/>
+        <div class="icap"><span class="icap-dot"></span>Revpipeline_SemanticModel.png &mdash; Direct Lake Semantic Model &amp; Relationships</div>
+      </div>
+      <div class="ic">
+        <img src="Revpipeline_ERD.png" alt="Manage Relationships ERD" onclick="openLb(this.src)"/>
+        <div class="icap"><span class="icap-dot"></span>Revpipeline_ERD.png &mdash; Manage Relationships View</div>
+      </div>
+    </div>
+
+    <div class="ig" style="margin-bottom:20px;">
+      <div class="ic">
+        <img src="Revpipeline_Lakehouse.png" alt="Lakehouse Bronze Tables" onclick="openLb(this.src)"/>
+        <div class="icap"><span class="icap-dot"></span>Revpipeline_Lakehouse.png &mdash; LH_RevPipeline360 Bronze Tables</div>
+      </div>
+      <div class="ic">
+        <img src="Revpipeline_Gold_Transform.png" alt="Gold Transform Notebook" onclick="openLb(this.src)"/>
+        <div class="icap"><span class="icap-dot"></span>Revpipeline_Gold_Transform.png &mdash; NB_Gold_Transform Notebook (PySpark)</div>
+      </div>
+    </div>
+
+    <div class="ig" style="margin-bottom:20px;">
+      <div class="ic">
+        <img src="Revpipeline_LakehousePipeline.png" alt="Pipeline Orchestration" onclick="openLb(this.src)"/>
+        <div class="icap"><span class="icap-dot"></span>Revpipeline_LakehousePipeline.png &mdash; PL_RevPipeline360_Refresh Orchestration</div>
+      </div>
+      <div class="ic">
+        <img src="Revpipeline_Dataflow.png" alt="Dataflow Gen2" onclick="openLb(this.src)"/>
+        <div class="icap"><span class="icap-dot"></span>Revpipeline_Dataflow.png &mdash; Dataflow Gen2 Query Editor (14 queries)</div>
+      </div>
+    </div>
+
+    <!-- Workspace full width -->
+    <div class="ig ig-wide">
+      <div class="ic">
+        <img src="RevPipeline_Workspace.png" alt="WS_RevPipeline360_Lab Workspace" onclick="openLb(this.src)"/>
+        <div class="icap"><span class="icap-dot"></span>RevPipeline_Workspace.png &mdash; WS_RevPipeline360_Lab Workspace</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 06 Flow Diagram ────────────────────────────────────────── -->
+  <section id="diagram">
+    <div class="lbl">06 &mdash; Flow Diagram</div>
+    <h2>Live Architecture Diagram</h2>
+    <div class="mwrap">
+      <div class="mermaid">
+flowchart TD
+  A[OneDrive CSV Files\nSalesforce + Finance + HR] --> B[Dataflow Gen2\n14 queries - bronze load]
+  B --> C[LH_RevPipeline360\nBronze Tables dbo.bronze_*]
+  C --> D[NB_Silver_Transform\nTRIM CAST NULLIF normalize]
+  D --> E[Silver Tables dbo.silver_*\ncleaned typed standardized]
+  E --> F[NB_Gold_Transform\nstar schema + date key joins]
+  F --> G1[Gold Dims\ndim_date customers products users campaigns]
+  F --> G2[Gold Facts\nopportunity leads invoices GL budget headcount]
+  G1 --> H[SM_RevPipeline360\nDirect Lake Semantic Model]
+  G2 --> H
+  H --> I[DAX Measures\nWin Rate CPI Conversion TREATAS attribution]
+  I --> J[RevDashboardV4\nRevenue Intelligence Dashboard]
+  C --> PL[PL_RevPipeline360_Refresh\nSilver then Gold on success]
+  PL --> D
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 07 Checklist ───────────────────────────────────────────── -->
+  <section id="checklist">
+    <div class="lbl">07 &mdash; Implementation</div>
+    <h2>Build Checklist</h2>
+    <ul class="cl">
+      <li><span class="chi">&#9670;</span>Ingest CSV source files from OneDrive via Dataflow Gen2 into Bronze tables (14 queries)</li>
+      <li><span class="chi">&#9670;</span>Build NB_Silver_Transform — TRIM, CAST, NULLIF, date normalization across all tables</li>
+      <li><span class="chi">&#9670;</span>Build NB_Gold_Transform — star schema dims and facts with date key enrichment via joins</li>
+      <li><span class="chi">&#9670;</span>Enhance gold_dim_campaigns with start_date_key and end_date_key for FY slicing</li>
+      <li><span class="chi">&#9670;</span>Configure PL_RevPipeline360_Refresh with Silver → Gold on-success chaining + retry/timeout</li>
+      <li><span class="chi">&#9670;</span>Build SM_RevPipeline360 Direct Lake semantic model with active/inactive relationship strategy</li>
+      <li><span class="chi">&#9670;</span>Implement DAX measures: Leads, Opportunities, Win Rate, Lead Conversion, Pipeline Amount</li>
+      <li><span class="chi">&#9670;</span>Implement TREATAS and USERELATIONSHIP attribution measures for campaign analytics</li>
+      <li><span class="chi">&#9670;</span>Build RevDashboardV4: Revenue Intelligence Campaign to Revenue report with FY slicer</li>
+    </ul>
+  </section>
+
+</main>
+
+<footer>Case Study &mdash; RevPipeline360 &mdash; Microsoft Fabric &bull; PySpark &bull; Direct Lake &bull; Power BI &bull; DAX</footer>
+<div id="lb" onclick="closeLb()"><img id="lbi" src="" alt=""/></div>
+
+<script>
+  mermaid.initialize({startOnLoad:true,theme:'dark',themeVariables:{background:'#0d1520',primaryColor:'#111d2e',primaryBorderColor:'#1a2d45',primaryTextColor:'#e8edf5',lineColor:'#0ea5e9',edgeLabelBackground:'#0d1520',secondaryColor:'#0f2035',tertiaryColor:'#070b12'}});
+  function openLb(s){document.getElementById('lbi').src=s;document.getElementById('lb').classList.add('open')}
+  function closeLb(){document.getElementById('lb').classList.remove('open')}
+  const ss=document.querySelectorAll('section[id]'),nl=document.querySelectorAll('nav a');
+  window.addEventListener('scroll',()=>{let c='';ss.forEach(s=>{if(window.scrollY>=s.offsetTop-80)c=s.id});nl.forEach(a=>{a.classList.toggle('active',a.getAttribute('href')==='#'+c)})},{passive:true});
+</script>
+</body>
+</html>
