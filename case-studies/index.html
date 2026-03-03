@@ -1,1 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PMO Performance &amp; EVM Architecture — Case Study</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.6.1/mermaid.min.js"></script>
+  <style>
+    :root {
+      --bg:#0d1117;--surface:#161b22;--surface2:#1c2333;--border:#30363d;
+      --text:#e6edf3;--muted:#8b949e;--accent:#c9a84c;--accent2:#58a6ff;
+      --tag-bg:#1f2d3d;--radius:10px;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{background:var(--bg);color:var(--text);font-family:'IBM Plex Sans',sans-serif;font-weight:300;line-height:1.7;min-height:100vh}
+    header{position:relative;padding:72px 48px 56px;border-bottom:1px solid var(--border);background:linear-gradient(160deg,#161b22 0%,#0d1117 100%);overflow:hidden}
+    header::after{content:'';position:absolute;top:-80px;right:-80px;width:400px;height:400px;background:radial-gradient(circle,rgba(201,168,76,.08) 0%,transparent 70%);pointer-events:none}
+    .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);margin-bottom:16px;display:flex;align-items:center;gap:10px}
+    .eyebrow::before{content:'';display:inline-block;width:28px;height:1px;background:var(--accent)}
+    h1{font-family:'Playfair Display',serif;font-size:clamp(28px,4vw,48px);font-weight:700;line-height:1.2;max-width:760px;margin-bottom:20px}
+    h1 span{color:var(--accent)}
+    .meta{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
+    .tag{background:var(--tag-bg);border:1px solid var(--border);color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;padding:4px 12px;border-radius:4px;letter-spacing:.05em}
+    .tag.hi{border-color:var(--accent);color:var(--accent)}
+    nav{position:sticky;top:0;z-index:100;background:rgba(13,17,23,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 48px;display:flex;gap:4px;overflow-x:auto}
+    nav a{display:inline-block;padding:14px 16px;font-size:13px;font-weight:500;color:var(--muted);text-decoration:none;border-bottom:2px solid transparent;white-space:nowrap;transition:color .2s,border-color .2s}
+    nav a:hover{color:var(--text);border-color:var(--border)}
+    nav a.active{color:var(--accent);border-color:var(--accent)}
+    main{max-width:1100px;margin:0 auto;padding:0 48px 96px}
+    section{padding-top:64px;border-top:1px solid var(--border);margin-top:64px}
+    section:first-child{border-top:none}
+    .lbl{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+    h2{font-family:'Playfair Display',serif;font-size:clamp(22px,3vw,32px);font-weight:700;margin-bottom:32px}
+    .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:40px}
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;transition:border-color .2s,transform .2s}
+    .card:hover{border-color:var(--accent);transform:translateY(-2px)}
+    .ci{font-size:22px;margin-bottom:12px}
+    .ct{font-size:11px;font-family:'IBM Plex Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+    .cv{font-size:15px;font-weight:500}
+    .doc{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:40px 48px;font-size:15px;line-height:1.8}
+    .doc h3{font-family:'Playfair Display',serif;font-size:20px;margin:32px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+    .doc h3:first-child{margin-top:0}
+    .doc p{color:#c9d1d9;margin-bottom:14px}
+    .doc ul{padding-left:24px;margin-bottom:14px}
+    .doc li{color:#c9d1d9;margin-bottom:6px}
+    .doc li::marker{color:var(--accent)}
+    .doc strong{color:var(--text);font-weight:600}
+    .doc code{font-family:'IBM Plex Mono',monospace;font-size:13px;background:var(--surface2);padding:2px 6px;border-radius:4px;color:var(--accent2)}
+    .doc table{width:100%;border-collapse:collapse;margin:20px 0;font-size:14px}
+    .doc th{background:var(--surface2);text-align:left;padding:10px 14px;color:var(--muted);font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;border-bottom:1px solid var(--border)}
+    .doc td{padding:10px 14px;border-bottom:1px solid var(--border);color:#c9d1d9;vertical-align:top}
+    .doc tr:last-child td{border-bottom:none}
+    .pdf-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+    .pdf-bar{background:var(--surface2);border-bottom:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)}
+    .pdf-bar span{font-family:'IBM Plex Mono',monospace;font-size:12px}
+    .dot{width:10px;height:10px;border-radius:50%}
+    .r{background:#ff5f57}.y{background:#febc2e}.g{background:#28c840}
+    .pdf-frame{width:100%;height:700px;border:none;display:block}
+    .ig{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
+    .ic{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:border-color .2s,transform .2s}
+    .ic:hover{border-color:var(--accent);transform:translateY(-2px)}
+    .ic img{width:100%;display:block;cursor:zoom-in}
+    .icap{padding:12px 16px;font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;border-top:1px solid var(--border)}
+    .mwrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:40px;overflow-x:auto}
+    .mermaid{display:flex;justify-content:center}
+    .cl{list-style:none;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+    .cl li{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px;font-size:14px;color:#c9d1d9;display:flex;align-items:flex-start;gap:12px;transition:border-color .2s}
+    .cl li:hover{border-color:var(--accent)}
+    .chi{color:var(--accent);font-size:16px;flex-shrink:0;margin-top:1px}
+    #lb{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:1000;justify-content:center;align-items:center;padding:24px;cursor:zoom-out}
+    #lb.open{display:flex}
+    #lb img{max-width:100%;max-height:90vh;border-radius:8px;box-shadow:0 24px 80px rgba(0,0,0,.8)}
+    footer{border-top:1px solid var(--border);padding:28px 48px;text-align:center;font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;letter-spacing:.05em}
+    @media(max-width:640px){header,main,nav,footer{padding-left:20px;padding-right:20px}.doc{padding:24px 20px}.pdf-frame{height:500px}}
+    @keyframes fu{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+    header{animation:fu .5s ease both}
+  </style>
+</head>
+<body>
 
+<header>
+  <div class="eyebrow">Case Study · Data &amp; Analytics</div>
+  <h1>PMO Performance &amp; <span>EVM Architecture</span></h1>
+  <p style="color:var(--muted);max-width:620px;font-size:15px;margin-top:8px;">A governed, reusable reference architecture for portfolio performance intelligence — spanning BQE Core, Smartsheet, and Power BI.</p>
+  <div class="meta">
+    <span class="tag hi">Power BI</span>
+    <span class="tag">Smartsheet</span>
+    <span class="tag">BQE Core</span>
+    <span class="tag">DAX / Power Query</span>
+    <span class="tag">EVM Analytics</span>
+    <span class="tag">PMO Operations</span>
+  </div>
+</header>
+
+<nav id="nav">
+  <a href="#overview" class="active">Overview</a>
+  <a href="#documentation">Documentation</a>
+  <a href="#pdf">Full PDF</a>
+  <a href="#visuals">Visuals</a>
+  <a href="#diagram">Flow Diagram</a>
+  <a href="#checklist">Checklist</a>
+</nav>
+
+<main>
+
+  <section id="overview">
+    <div class="lbl">01 — Overview</div>
+    <h2>System at a Glance</h2>
+    <div class="cards">
+      <div class="card"><div class="ci">🏦</div><div class="ct">Financial Source</div><div class="cv">BQE Core<br><small style="color:var(--muted);font-size:13px;">Actuals / Spend (AC)</small></div></div>
+      <div class="card"><div class="ci">📋</div><div class="ct">System of Record</div><div class="cv">Smartsheet<br><small style="color:var(--muted);font-size:13px;">PM-governed plan + progress</small></div></div>
+      <div class="card"><div class="ci">📊</div><div class="ct">Analytics Engine</div><div class="cv">Power BI (DAX)<br><small style="color:var(--muted);font-size:13px;">CPI / SPI / EAC / ETC</small></div></div>
+      <div class="card"><div class="ci">🔐</div><div class="ct">Governance</div><div class="cv">Update Requests<br><small style="color:var(--muted);font-size:13px;">Scheduled · Restricted fields</small></div></div>
+    </div>
+  </section>
+
+  <section id="documentation">
+    <div class="lbl">02 — Architecture Doc</div>
+    <h2>Reference Architecture</h2>
+    <div class="doc">
+      <h3>Purpose</h3>
+      <p>A reusable reference architecture for a governed PMO performance system that:</p>
+      <ul>
+        <li>Ingests financial actuals/spend from <strong>BQE Core</strong> (Actual Cost inputs)</li>
+        <li>Collects PM-owned plan dates and execution progress through governed <strong>Smartsheet Update Requests</strong></li>
+        <li>Calculates EVM-style metrics in <strong>Smartsheet</strong> and <strong>Power BI</strong> (Power Query + DAX)</li>
+        <li>Delivers operational Smartsheet dashboards and executive Power BI dashboards</li>
+      </ul>
+      <h3>Logical Layers</h3>
+      <table>
+        <thead><tr><th>Layer</th><th>Purpose</th><th>Components</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Financial Source</strong></td><td>Provide actuals/spend and financial truth (AC)</td><td>BQE Core: actual cost/spend; financial attributes</td></tr>
+          <tr><td><strong>Integration / Sync</strong></td><td>Load and refresh actuals into Smartsheet keyed by Project ID</td><td>API/ODBC/export+load; scheduled sync; idempotent updates</td></tr>
+          <tr><td><strong>System of Record</strong></td><td>Central PMO tracker with governed plan/progress fields</td><td>Smartsheet master tracker; reference/lookup sheets</td></tr>
+          <tr><td><strong>Governed Inputs</strong></td><td>Collect PM-owned dates and progress with accountability</td><td>Update Requests; restricted fields; cadence rules; auditability</td></tr>
+          <tr><td><strong>EVM Calculation</strong></td><td>Compute PV/EV/AC and derived KPIs</td><td>Smartsheet formulas; Power Query (M); DAX measures</td></tr>
+          <tr><td><strong>Visibility Layer</strong></td><td>Operational + executive views and exception management</td><td>Smartsheet reports/dashboards; Power BI dashboards</td></tr>
+        </tbody>
+      </table>
+      <h3>Data Model — Smartsheet PMO Tracker</h3>
+      <ul>
+        <li><strong>Primary key:</strong> Project ID (joins BQE Core actuals to Smartsheet plan/progress)</li>
+        <li><strong>Financial fields (from BQE Core):</strong> actual cost/spend and related financial metrics</li>
+        <li><strong>PM-governed plan fields:</strong> Project Start Date and Project End Date via Update Requests</li>
+        <li><strong>Execution fields:</strong> phase completion updates and deployment progress</li>
+        <li><strong>Traceability:</strong> last updated date, owner fields, notes/evidence links</li>
+      </ul>
+      <h3>Governance &amp; Update Workflows</h3>
+      <ul>
+        <li><strong>Controlled input:</strong> PMs provide updates through Smartsheet Update Requests, not broad sheet edit access</li>
+        <li><strong>Cadence rules:</strong> weekly/bi-weekly or stage-based scheduling to maintain data freshness</li>
+        <li><strong>Field-level governance:</strong> plan fields (start/end dates) are restricted as baseline-defining inputs</li>
+        <li><strong>Quality controls:</strong> required fields, standardized definitions, and exception reporting for missing updates</li>
+      </ul>
+      <h3>EVM Calculation Approach</h3>
+      <ul>
+        <li><strong>Inputs:</strong> <code>PV</code> from plan timelines · <code>EV</code> from phase completion · <code>AC</code> from BQE Core</li>
+        <li><strong>Core KPIs:</strong> <code>CPI</code> · <code>SPI</code> · <code>CV/SV</code> (cost/schedule variance)</li>
+        <li><strong>Forecasting:</strong> <code>EAC</code> and <code>ETC</code> measures in Power BI for portfolio trend analysis</li>
+        <li><strong>Implementation:</strong> Smartsheet formulas · Power Query (M) · DAX measures</li>
+      </ul>
+      <h3>Dashboards &amp; Reporting</h3>
+      <ul>
+        <li><strong>Smartsheet operational dashboards:</strong> action queues, phase/deployment rollups, exception views</li>
+        <li><strong>Power BI executive dashboards:</strong> CPI/SPI trend lines, EAC/ETC forecasting, variance analysis, portfolio comparisons</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="pdf">
+    <div class="lbl">03 — Full Document</div>
+    <h2>PDF Reference</h2>
+    <div class="pdf-wrap">
+      <div class="pdf-bar">
+        <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+        <span>PMO_EVM_Architecture_Documentation.pdf</span>
+      </div>
+      <iframe class="pdf-frame" src="PMO_EVM_Architecture_Documentation.pdf#toolbar=0&navpanes=0&scrollbar=1&view=FitH" title="PMO EVM Architecture Documentation"></iframe>
+    </div>
+  </section>
+
+  <section id="visuals">
+    <div class="lbl">04 — Visual Artifacts</div>
+    <h2>Dashboards &amp; Architecture Diagrams</h2>
+    <div class="ig">
+      <div class="ic">
+        <img src="PMO_EVM_Dashboard.png" alt="PMO Executive Portfolio Dashboard" onclick="openLb(this.src)"/>
+        <div class="icap">PMO_EVM_Dashboard.png — Executive Portfolio Dashboard</div>
+      </div>
+      <div class="ic">
+        <img src="PMO_EVM_Smartsheet.png" alt="Automated PMO Performance EVM Architecture" onclick="openLb(this.src)"/>
+        <div class="icap">PMO_EVM_Smartsheet.png — Architecture Overview</div>
+      </div>
+      <div class="ic">
+        <img src="PMO_EVM_Workflow_Diagram.png" alt="PMO Performance EVM Architecture Workflow" onclick="openLb(this.src)"/>
+        <div class="icap">PMO_EVM_Workflow_Diagram.png — Workflow Diagram</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="diagram">
+    <div class="lbl">05 — Flow Diagram</div>
+    <h2>Live Architecture Diagram</h2>
+    <div class="mwrap">
+      <div class="mermaid">
+flowchart TD
+  A[BQE Core\nActuals/Spend AC] --> B[Integration / Sync\nload + refresh]
+  B --> C[Smartsheet PMO Tracker\nSystem of Record]
+  D[PMs / Owners] -->|Update Requests\nStart/End Dates governed| C
+  D -->|Update Requests\nPhase + Deployment progress| C
+  C --> E[Smartsheet Formula Layer\nOperational KPIs]
+  C --> F[Power Query M\nData shaping + joins]
+  F --> G[DAX Measures\nEVM KPIs CPI/SPI/EAC/ETC]
+  G --> H[Power BI Dashboards\nExecutive / Portfolio Views]
+  C --> I[Smartsheet Reports\nAction queues + exceptions]
+  I --> J[Smartsheet Dashboards\nOperational visibility]
+      </div>
+    </div>
+  </section>
+
+  <section id="checklist">
+    <div class="lbl">06 — Implementation</div>
+    <h2>Implementation Checklist</h2>
+    <ul class="cl">
+      <li><span class="chi">◆</span>Define PMO tracker schema — Project ID key, owners, plan fields, progress fields, financial fields</li>
+      <li><span class="chi">◆</span>Stand up integration/sync from BQE Core to Smartsheet for actuals/spend refresh</li>
+      <li><span class="chi">◆</span>Configure governance — restricted plan fields, update request cadence, required-field rules</li>
+      <li><span class="chi">◆</span>Implement progress update workflows for phase completion and deployment tracking</li>
+      <li><span class="chi">◆</span>Build EVM metrics — PV/EV/AC inputs, CPI/SPI, variance, and forecasting measures (EAC/ETC)</li>
+      <li><span class="chi">◆</span>Publish Smartsheet operational reports + dashboards and Power BI executive dashboards</li>
+      <li><span class="chi">◆</span>Document definitions and SOPs; establish operating cadence for data quality and exception management</li>
+    </ul>
+  </section>
+
+</main>
+
+<footer>Case Study · PMO Performance &amp; EVM Architecture · BQE Core + Smartsheet + Power BI</footer>
+
+<div id="lb" onclick="closeLb()"><img id="lbi" src="" alt=""/></div>
+
+<script>
+  mermaid.initialize({startOnLoad:true,theme:'dark',themeVariables:{background:'#161b22',primaryColor:'#1c2333',primaryBorderColor:'#30363d',primaryTextColor:'#e6edf3',lineColor:'#c9a84c',edgeLabelBackground:'#161b22',secondaryColor:'#1f2d3d',tertiaryColor:'#0d1117'}});
+  function openLb(s){document.getElementById('lbi').src=s;document.getElementById('lb').classList.add('open')}
+  function closeLb(){document.getElementById('lb').classList.remove('open')}
+  const ss=document.querySelectorAll('section[id]'),nl=document.querySelectorAll('nav a');
+  window.addEventListener('scroll',()=>{let c='';ss.forEach(s=>{if(window.scrollY>=s.offsetTop-80)c=s.id});nl.forEach(a=>{a.classList.toggle('active',a.getAttribute('href')==='#'+c)})},{passive:true});
+</script>
+</body>
+</html>

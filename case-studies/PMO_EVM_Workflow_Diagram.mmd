@@ -1,0 +1,15 @@
+flowchart TD
+  A[BQE Core\nActuals/Spend (AC)] --> B[Integration / Sync\n(load + refresh)]
+  B --> C[Smartsheet PMO Tracker\nSystem of Record (1 row per project)]
+
+  D[PMs / Owners] -->|Update Requests\n(Start/End Dates; governed)| C
+  D -->|Update Requests\n(Phase + Deployment progress)| C
+
+  C --> E[Smartsheet Formula Layer\nOperational KPIs]
+  C --> F[Power Query (M)\nData shaping + joins]
+  F --> G[DAX Measures\nEVM KPIs (CPI/SPI/EAC/ETC)]
+  G --> H[Power BI Dashboards\nExecutive / Portfolio Views]
+
+  C --> I[Smartsheet Reports\nAction queues + exceptions]
+  I --> J[Smartsheet Dashboards\nOperational visibility]
+
