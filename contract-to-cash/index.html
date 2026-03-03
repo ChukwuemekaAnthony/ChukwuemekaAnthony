@@ -1,1 +1,222 @@
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Contract-to-Cash Lifecycle Architecture - Case Study</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.6.1/mermaid.min.js"></script>
+  <style>
+    :root{--bg:#f7f5f2;--surface:#ffffff;--surface2:#f0ede8;--border:#e2ddd6;--text:#1a1714;--muted:#7a7470;--accent:#1e6f5c;--accent2:#c84b1e;--radius:10px}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-weight:300;line-height:1.7;min-height:100vh}
+    header{position:relative;padding:72px 48px 80px;border-bottom:1px solid var(--border);background:linear-gradient(150deg,#0f3d30 0%,#1e6f5c 60%,#2a9d7f 100%);overflow:hidden}
+    header::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:48px;background:var(--bg);clip-path:ellipse(55% 100% at 50% 100%)}
+    .eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.6);margin-bottom:16px;display:flex;align-items:center;gap:10px}
+    .eyebrow::before{content:'';display:inline-block;width:28px;height:1px;background:rgba(255,255,255,.4)}
+    h1{font-family:'DM Serif Display',serif;font-size:clamp(30px,4.5vw,54px);font-weight:400;line-height:1.15;color:#fff;max-width:780px;margin-bottom:16px}
+    h1 em{font-style:italic;color:#7dd4b8}
+    .hdesc{color:rgba(255,255,255,.75);max-width:600px;font-size:15px;margin-top:8px}
+    .meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:32px}
+    .tag{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.85);font-size:12px;font-family:'JetBrains Mono',monospace;padding:4px 12px;border-radius:4px;letter-spacing:.04em}
+    .tag.hi{background:rgba(255,255,255,.2);border-color:rgba(255,255,255,.4);color:#fff}
+    nav{position:sticky;top:0;z-index:100;background:rgba(247,245,242,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 48px;display:flex;gap:4px;overflow-x:auto}
+    nav a{display:inline-block;padding:14px 16px;font-size:13px;font-weight:500;color:var(--muted);text-decoration:none;border-bottom:2px solid transparent;white-space:nowrap;transition:color .2s,border-color .2s}
+    nav a:hover{color:var(--text);border-color:var(--border)}
+    nav a.active{color:var(--accent);border-color:var(--accent)}
+    main{max-width:1100px;margin:0 auto;padding:0 48px 96px}
+    section{padding-top:64px;border-top:1px solid var(--border);margin-top:64px}
+    section:first-child{border-top:none}
+    .lbl{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+    h2{font-family:'DM Serif Display',serif;font-size:clamp(24px,3vw,36px);font-weight:400;margin-bottom:32px;color:var(--text)}
+    .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:40px}
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;transition:border-color .2s,box-shadow .2s}
+    .card:hover{border-color:var(--accent);box-shadow:0 4px 20px rgba(30,111,92,.08)}
+    .ci{font-size:22px;margin-bottom:12px}.ct{font-size:11px;font-family:'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+    .cv{font-size:15px;font-weight:500;color:var(--text)}
+    .impact{background:linear-gradient(135deg,#0f3d30,#1e6f5c);border-radius:var(--radius);padding:32px 40px;margin-bottom:40px;display:flex;align-items:center;gap:32px;flex-wrap:wrap}
+    .impact-num{font-family:'DM Serif Display',serif;font-size:52px;color:#7dd4b8;line-height:1;flex-shrink:0}
+    .impact-text h3{font-size:17px;font-weight:600;color:#fff;margin-bottom:6px}
+    .impact-text p{font-size:14px;color:rgba(255,255,255,.7);max-width:520px}
+    .doc{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:40px 48px;font-size:15px;line-height:1.8}
+    .doc h3{font-family:'DM Serif Display',serif;font-size:20px;color:var(--text);margin:32px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+    .doc h3:first-child{margin-top:0}
+    .doc p{color:#4a4540;margin-bottom:14px}
+    .doc ul{padding-left:24px;margin-bottom:14px}
+    .doc li{color:#4a4540;margin-bottom:6px}
+    .doc li::marker{color:var(--accent)}
+    .doc strong{color:var(--text);font-weight:600}
+    .doc code{font-family:'JetBrains Mono',monospace;font-size:13px;background:var(--surface2);padding:2px 6px;border-radius:4px;color:var(--accent2)}
+    .doc table{width:100%;border-collapse:collapse;margin:20px 0;font-size:14px}
+    .doc th{background:var(--surface2);text-align:left;padding:10px 14px;color:var(--muted);font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;border-bottom:1px solid var(--border)}
+    .doc td{padding:10px 14px;border-bottom:1px solid var(--border);color:#4a4540;vertical-align:top}
+    .doc tr:last-child td{border-bottom:none}
+    .pdf-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+    .pdf-bar{background:var(--surface2);border-bottom:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)}
+    .pdf-bar span{font-family:'JetBrains Mono',monospace;font-size:12px}
+    .dot{width:10px;height:10px;border-radius:50%}.r{background:#ff5f57}.y{background:#febc2e}.g{background:#28c840}
+    .pdf-frame{width:100%;height:700px;border:none;display:block}
+    .ig{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
+    .ic{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:border-color .2s,box-shadow .2s}
+    .ic:hover{border-color:var(--accent);box-shadow:0 4px 20px rgba(30,111,92,.08)}
+    .ic img{width:100%;display:block;cursor:zoom-in}
+    .icap{padding:12px 16px;font-size:12px;color:var(--muted);font-family:'JetBrains Mono',monospace;border-top:1px solid var(--border)}
+    .mwrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:40px;overflow-x:auto}
+    .mermaid{display:flex;justify-content:center}
+    .cl{list-style:none;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+    .cl li{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px;font-size:14px;color:#4a4540;display:flex;align-items:flex-start;gap:12px;transition:border-color .2s}
+    .cl li:hover{border-color:var(--accent)}
+    .chi{color:var(--accent);font-size:15px;flex-shrink:0;margin-top:2px}
+    #lb{display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:1000;justify-content:center;align-items:center;padding:24px;cursor:zoom-out}
+    #lb.open{display:flex}
+    #lb img{max-width:100%;max-height:90vh;border-radius:8px;box-shadow:0 24px 80px rgba(0,0,0,.8)}
+    footer{border-top:1px solid var(--border);padding:28px 48px;text-align:center;font-size:12px;color:var(--muted);font-family:'JetBrains Mono',monospace;letter-spacing:.05em}
+    @media(max-width:640px){header,main,nav,footer{padding-left:20px;padding-right:20px}.doc{padding:24px 20px}.pdf-frame{height:500px}.impact{padding:24px}.impact-num{font-size:40px}}
+    @keyframes fu{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+    header{animation:fu .5s ease both}
+  </style>
+</head>
+<body>
+<header>
+  <div class="eyebrow">Case Study - Revenue Operations</div>
+  <h1>Contract-to-Cash <em>Lifecycle Architecture</em></h1>
+  <p class="hdesc">A stage-gated, governed C2C tracker integrating Salesforce and Smartsheet - clearing over $500K in payment backlog across Sales, Finance, and Operations.</p>
+  <div class="meta">
+    <span class="tag hi">Salesforce</span><span class="tag hi">Smartsheet</span><span class="tag">Power BI</span><span class="tag">Revenue Operations</span><span class="tag">Stage-Gated Governance</span><span class="tag">Power Platform</span>
+  </div>
+</header>
+<nav id="nav">
+  <a href="#overview" class="active">Overview</a>
+  <a href="#documentation">Documentation</a>
+  <a href="#pdf">Full PDF</a>
+  <a href="#visuals">Visuals</a>
+  <a href="#diagram">Flow Diagram</a>
+  <a href="#checklist">Checklist</a>
+</nav>
+<main>
+  <section id="overview">
+    <div class="lbl">01 - Overview</div><h2>System at a Glance</h2>
+    <div class="impact">
+      <div class="impact-num">$500K+</div>
+      <div class="impact-text"><h3>Payment Backlog Cleared</h3><p>Built and deployed a contract-to-cash workflow system spanning Sales, Finance, and Operations using Smartsheet and Power Platform - eliminating revenue leakage and accelerating milestone billing cycles.</p></div>
+    </div>
+    <div class="cards">
+      <div class="card"><div class="ci">&#128279;</div><div class="ct">Upstream Trigger</div><div class="cv">Salesforce CRM<br><small style="color:var(--muted);font-size:13px;">Opportunity stage change</small></div></div>
+      <div class="card"><div class="ci">&#128203;</div><div class="ct">System of Record</div><div class="cv">Smartsheet<br><small style="color:var(--muted);font-size:13px;">1 row per engagement</small></div></div>
+      <div class="card"><div class="ci">&#128274;</div><div class="ct">Core Control</div><div class="cv">Stage-Gated Engine<br><small style="color:var(--muted);font-size:13px;">Business-day cadence</small></div></div>
+      <div class="card"><div class="ci">&#128202;</div><div class="ct">Visibility</div><div class="cv">Exec Dashboards<br><small style="color:var(--muted);font-size:13px;">Pipeline + aging + exceptions</small></div></div>
+    </div>
+  </section>
+  <section id="documentation">
+    <div class="lbl">02 - Architecture Doc</div><h2>Reference Architecture</h2>
+    <div class="doc">
+      <h3>Purpose</h3>
+      <p>A reusable, client-safe reference architecture for a Contract-to-Cash (C2C) document lifecycle tracker that:</p>
+      <ul>
+        <li>Ingests opportunity events from <strong>Salesforce</strong></li>
+        <li>Uses <strong>Smartsheet</strong> as the system of record (one row per engagement)</li>
+        <li>Enforces <strong>stage-gated governance</strong> with business-day reminder cadence</li>
+        <li>Routes update requests by role and provides operational + executive visibility</li>
+        <li>Supports scaling via standardization and optional provisioning</li>
+      </ul>
+      <h3>Logical Layers</h3>
+      <table>
+        <thead><tr><th>Layer</th><th>Purpose</th><th>Components</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Source + Trigger</strong></td><td>Detect lifecycle events and provide upstream metadata</td><td>Salesforce Opportunity stage change; field mapping</td></tr>
+          <tr><td><strong>Integration / Handshake</strong></td><td>Create/update a canonical record in Smartsheet</td><td>API/middleware workflow; controlled form intake; idempotent upsert</td></tr>
+          <tr><td><strong>System of Record</strong></td><td>Maintain the golden row per engagement and lifecycle history</td><td>Smartsheet master tracker; reference/lookup sheets</td></tr>
+          <tr><td><strong>Workflow Engine</strong></td><td>Enforce stage gates, stop/skip logic, and lifecycle transitions</td><td>Stage prerequisites; completion checkbox/date; validation rules</td></tr>
+          <tr><td><strong>Scheduling Layer</strong></td><td>Drive follow-up cadence using business days</td><td>Helper-date columns; WORKDAY/NETWORKDAYS logic; holiday calendar</td></tr>
+          <tr><td><strong>Automation Layer</strong></td><td>Notify and collect updates from owners based on role</td><td>Alerts; update requests; conditional routing; optional escalation</td></tr>
+          <tr><td><strong>Visibility Layer</strong></td><td>Provide operational queues and executive reporting</td><td>Reports; dashboards; pipeline/aging views; exception widgets</td></tr>
+          <tr><td><strong>Extensibility</strong></td><td>Enable analytics and cross-platform reporting</td><td>Data Shuttle; ODBC/API extracts; BI semantic model; Power BI</td></tr>
+        </tbody>
+      </table>
+      <h3>Data Model</h3>
+      <ul>
+        <li><strong>Canonical keys:</strong> Opportunity ID (primary key), engagement/client identifiers, owner roles</li>
+        <li><strong>Stage columns:</strong> Stage Status, Stage Date, Evidence link/attachment, Notes</li>
+        <li><strong>Reference tables:</strong> owner lookup, role routing tables, optional holiday calendar</li>
+        <li><strong>Audit readiness:</strong> evidence links and date-stamped milestone completion for traceability</li>
+      </ul>
+      <h3>Stage Gating and Lifecycle Controls</h3>
+      <ul>
+        <li><strong>Prerequisites:</strong> a stage becomes active only when prior-stage conditions are met</li>
+        <li><strong>Stop condition:</strong> reminders cease once the stage completion date is populated</li>
+        <li><strong>Skip logic:</strong> if a stage is completed at intake, the workflow bypasses reminders and advances</li>
+        <li><strong>Validation:</strong> required fields enforced at key gates</li>
+      </ul>
+      <h3>Scheduling and Reminder Cadence</h3>
+      <ul>
+        <li><strong>Helper date:</strong> <code>Next Stage Reminder (Auto)</code> calculated with <code>WORKDAY/NETWORKDAYS</code> logic</li>
+        <li><strong>Cadence:</strong> weekly business-day reminders until stage is completed</li>
+        <li><strong>Holiday support:</strong> optional holiday table integrated into business-day calculations</li>
+      </ul>
+      <h3>Reporting and Dashboards</h3>
+      <ul>
+        <li><strong>Operational action queues:</strong> overdue items, stuck stages, next reminder due, owner task lists</li>
+        <li><strong>Executive dashboards:</strong> pipeline by stage, aging distribution, bottleneck hotspots, next actions by team</li>
+        <li><strong>Performance metrics:</strong> cycle time per stage, SLA compliance, throughput trends</li>
+      </ul>
+    </div>
+  </section>
+  <section id="pdf">
+    <div class="lbl">03 - Full Document</div><h2>PDF Reference</h2>
+    <div class="pdf-wrap">
+      <div class="pdf-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><span>Contract_to_Cash_Lifecycle_Architecture_Documentation.pdf</span></div>
+      <iframe class="pdf-frame" src="Contract_to_Cash_Lifecycle_Architecture_Documentation.pdf#toolbar=0&navpanes=0&scrollbar=1&view=FitH" title="Contract to Cash Architecture"></iframe>
+    </div>
+  </section>
+  <section id="visuals">
+    <div class="lbl">04 - Visual Artifacts</div><h2>Dashboards and Architecture Diagrams</h2>
+    <div class="ig">
+      <div class="ic"><img src="Contract_to_Cash_Exec_Dashboard.png" alt="Executive Dashboard" onclick="openLb(this.src)"/><div class="icap">Contract_to_Cash_Exec_Dashboard.png - Executive Dashboard</div></div>
+      <div class="ic"><img src="Contract_to_Cash_Workflow_Visual.png" alt="Lifecycle Architecture" onclick="openLb(this.src)"/><div class="icap">Contract_to_Cash_Workflow_Visual.png - Lifecycle Architecture</div></div>
+    </div>
+  </section>
+  <section id="diagram">
+    <div class="lbl">05 - Flow Diagram</div><h2>Live Architecture Diagram</h2>
+    <div class="mwrap">
+      <div class="mermaid">
+flowchart TD
+  A[Salesforce Opportunity stage changes] --> B[Integration Handshake API middleware]
+  B --> C[Smartsheet Intake Form or upsert]
+  C --> D[Smartsheet System of Record Master Tracker]
+  D --> E[Stage-gated workflow engine]
+  E --> F[Helper dates business-day]
+  F --> G[Automation role routing]
+  G --> H[Stakeholder updates Sales Delivery Finance]
+  H --> D
+  D --> I[Dynamic View WorkApps role-based access]
+  D --> J[Operational reports action queues]
+  J --> K[Executive dashboards pipeline and aging]
+  D --> L[Control Center optional provisioning]
+  D --> M[Data Shuttle ODBC API to BI model optional]
+      </div>
+    </div>
+  </section>
+  <section id="checklist">
+    <div class="lbl">06 - Implementation</div><h2>Implementation Checklist</h2>
+    <ul class="cl">
+      <li><span class="chi">&#9670;</span>Define lifecycle stages and required fields per stage (status, date, evidence)</li>
+      <li><span class="chi">&#9670;</span>Define role ownership per stage and build routing rules (Sales, Delivery, Finance)</li>
+      <li><span class="chi">&#9670;</span>Define helper-date logic and reminder cadence; include holiday calendar if required</li>
+      <li><span class="chi">&#9670;</span>Implement intake mapping from Salesforce to Smartsheet with idempotent create/update behavior</li>
+      <li><span class="chi">&#9670;</span>Build exception reports and dashboards; test stop/skip logic end-to-end</li>
+      <li><span class="chi">&#9670;</span>Document SOPs and handoff rules; enable contributors via Dynamic View/WorkApps if needed</li>
+    </ul>
+  </section>
+</main>
+<footer>Case Study - Contract-to-Cash Lifecycle Architecture - Salesforce + Smartsheet + Power BI</footer>
+<div id="lb" onclick="closeLb()"><img id="lbi" src="" alt=""/></div>
+<script>
+  mermaid.initialize({startOnLoad:true,theme:'default',themeVariables:{background:'#ffffff',primaryColor:'#e8f5f1',primaryBorderColor:'#1e6f5c',primaryTextColor:'#1a1714',lineColor:'#1e6f5c',edgeLabelBackground:'#f7f5f2',secondaryColor:'#f0ede8',tertiaryColor:'#faf9f7'}});
+  function openLb(s){document.getElementById('lbi').src=s;document.getElementById('lb').classList.add('open')}
+  function closeLb(){document.getElementById('lb').classList.remove('open')}
+  const ss=document.querySelectorAll('section[id]'),nl=document.querySelectorAll('nav a');
+  window.addEventListener('scroll',()=>{let c='';ss.forEach(s=>{if(window.scrollY>=s.offsetTop-80)c=s.id});nl.forEach(a=>{a.classList.toggle('active',a.getAttribute('href')==='#'+c)})},{passive:true});
+</script>
+</body>
+</html>
