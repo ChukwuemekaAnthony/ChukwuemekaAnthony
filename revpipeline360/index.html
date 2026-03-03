@@ -196,6 +196,15 @@
     .cl li:hover { border-color: var(--accent); }
     .chi { color: var(--accent); font-size: 14px; flex-shrink: 0; margin-top: 3px; font-family: 'JetBrains Mono', monospace; }
 
+    /* ── Video ── */
+    .video-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(440px, 1fr)); gap: 24px; }
+    .video-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; transition: border-color .2s, transform .2s; }
+    .video-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .video-card video { width: 100%; display: block; background: #000; max-height: 360px; }
+    .video-cap { padding: 14px 18px; border-top: 1px solid var(--border); }
+    .video-cap-title { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .video-cap-desc { font-size: 12px; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+
     /* ── Lightbox ── */
     #lb { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.94); z-index: 1000; justify-content: center; align-items: center; padding: 24px; cursor: zoom-out; }
     #lb.open { display: flex; }
@@ -231,6 +240,7 @@
   <a href="#architecture">Architecture</a>
   <a href="#documentation">Documentation</a>
   <a href="#pdf">Full PDF</a>
+  <a href="#video">Video</a>
   <a href="#visuals">Visuals</a>
   <a href="#diagram">Flow Diagram</a>
   <a href="#checklist">Checklist</a>
@@ -383,9 +393,37 @@
     </div>
   </section>
 
-  <!-- ── 05 Visuals ─────────────────────────────────────────────── -->
+  <!-- ── 05 Video ──────────────────────────────────────────────── -->
+  <section id="video">
+    <div class="lbl">05 &mdash; Video Walkthrough</div>
+    <h2>Build in Action</h2>
+    <div class="video-grid">
+      <div class="video-card">
+        <video controls preload="metadata" poster="">
+          <source src="16-57-08.mp4" type="video/mp4"/>
+          Your browser does not support the video tag.
+        </video>
+        <div class="video-cap">
+          <div class="video-cap-title">Fabric Workspace &amp; Pipeline Walkthrough</div>
+          <div class="video-cap-desc">16-57-08.mp4 &mdash; WS_RevPipeline360_Lab overview</div>
+        </div>
+      </div>
+      <div class="video-card">
+        <video controls preload="metadata" poster="">
+          <source src="18-57-16.mp4" type="video/mp4"/>
+          Your browser does not support the video tag.
+        </video>
+        <div class="video-cap">
+          <div class="video-cap-title">Dashboard &amp; Semantic Model Demo</div>
+          <div class="video-cap-desc">18-57-16.mp4 &mdash; RevDashboardV4 live walkthrough</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 06 Visuals ─────────────────────────────────────────────── -->
   <section id="visuals">
-    <div class="lbl">05 &mdash; Visual Artifacts</div>
+    <div class="lbl">06 &mdash; Visual Artifacts</div>
     <h2>Build Screenshots</h2>
 
     <!-- Dashboard full width -->
@@ -441,7 +479,7 @@
 
   <!-- ── 06 Flow Diagram ────────────────────────────────────────── -->
   <section id="diagram">
-    <div class="lbl">06 &mdash; Flow Diagram</div>
+    <div class="lbl">07 &mdash; Flow Diagram</div>
     <h2>Live Architecture Diagram</h2>
     <div class="mwrap">
       <div class="mermaid">
@@ -465,7 +503,7 @@ flowchart TD
 
   <!-- ── 07 Checklist ───────────────────────────────────────────── -->
   <section id="checklist">
-    <div class="lbl">07 &mdash; Implementation</div>
+    <div class="lbl">08 &mdash; Implementation</div>
     <h2>Build Checklist</h2>
     <ul class="cl">
       <li><span class="chi">&#9670;</span>Ingest CSV source files from OneDrive via Dataflow Gen2 into Bronze tables (14 queries)</li>
