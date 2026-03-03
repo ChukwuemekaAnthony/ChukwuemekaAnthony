@@ -1,0 +1,17 @@
+flowchart TD
+  A[Salesforce: Opportunity stage changes] --> B[Integration/Handshake (API/middleware)]
+  B --> C[Smartsheet Intake (Form or upsert)]
+  C --> D[Smartsheet System of Record (Master Tracker)]
+
+  D --> E[Stage-gated workflow engine]
+  E --> F[Helper dates (business-day)]
+  F --> G[Automation (role routing)]
+  G --> H[Stakeholder updates (Sales/Delivery/Finance)]
+  H --> D
+
+  D --> I[Dynamic View / WorkApps (role-based access)]
+  D --> J[Operational reports (action queues)]
+  J --> K[Executive dashboards (pipeline + aging)]
+
+  D --> L[Control Center (optional provisioning)]
+  D --> M[Data Shuttle / ODBC / API -> BI model (optional)]
