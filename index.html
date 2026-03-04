@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Anthony Orji — Data Analytics Portfolio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #070b12;
+      --surface: #0d1520;
+      --surface2: #111d2e;
+      --border: #1a2d45;
+      --text: #e8edf5;
+      --muted: #6b7e96;
+      --accent: #0ea5e9;
+      --accent2: #38bdf8;
+      --gold: #f59e0b;
+      --green: #10b981;
+      --purple: #8b5cf6;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; font-weight: 300; line-height: 1.7; min-height: 100vh; }
+
+    /* ── Hero ── */
+    .hero {
+      position: relative; min-height: 100vh;
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 80px 64px; overflow: hidden;
+    }
+    .hero::before {
+      content: ''; position: absolute; inset: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 70% 50% at 80% 20%, rgba(14,165,233,.14) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 40% at 10% 80%, rgba(139,92,246,.10) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 30% at 50% 100%, rgba(16,185,129,.06) 0%, transparent 60%);
+    }
+    .grid-bg {
+      position: absolute; inset: 0; pointer-events: none; opacity: .03;
+      background-image: linear-gradient(var(--accent) 1px, transparent 1px),
+                        linear-gradient(90deg, var(--accent) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+    .hero-eyebrow {
+      font-family: 'JetBrains Mono', monospace; font-size: 11px;
+      letter-spacing: .25em; text-transform: uppercase; color: var(--accent);
+      margin-bottom: 24px; display: flex; align-items: center; gap: 12px;
+      opacity: 0; animation: fadeUp .6s .1s ease both;
+    }
+    .hero-eyebrow::before { content: ''; width: 32px; height: 1px; background: var(--accent); display: inline-block; }
+    .hero-name {
+      font-family: 'Syne', sans-serif; font-size: clamp(42px, 7vw, 88px);
+      font-weight: 800; line-height: 1.0; color: var(--text); margin-bottom: 8px;
+      opacity: 0; animation: fadeUp .6s .2s ease both;
+    }
+    .hero-name span { color: var(--accent); }
+    .hero-title {
+      font-family: 'Syne', sans-serif; font-size: clamp(18px, 3vw, 28px);
+      font-weight: 400; color: var(--muted); margin-bottom: 28px;
+      opacity: 0; animation: fadeUp .6s .3s ease both;
+    }
+    .hero-title em { font-style: normal; color: var(--gold); }
+    .hero-desc {
+      max-width: 560px; font-size: 15px; color: var(--muted); line-height: 1.8;
+      margin-bottom: 40px;
+      opacity: 0; animation: fadeUp .6s .4s ease both;
+    }
+    .hero-tags {
+      display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 48px;
+      opacity: 0; animation: fadeUp .6s .5s ease both;
+    }
+    .htag {
+      background: rgba(14,165,233,.08); border: 1px solid rgba(14,165,233,.18);
+      color: var(--accent2); font-size: 12px; font-family: 'JetBrains Mono', monospace;
+      padding: 5px 14px; border-radius: 4px; letter-spacing: .04em;
+    }
+    .htag.gold { background: rgba(245,158,11,.08); border-color: rgba(245,158,11,.2); color: var(--gold); }
+    .htag.green { background: rgba(16,185,129,.08); border-color: rgba(16,185,129,.2); color: var(--green); }
+    .htag.purple { background: rgba(139,92,246,.08); border-color: rgba(139,92,246,.2); color: #a78bfa; }
+    .hero-cta {
+      display: flex; gap: 16px; flex-wrap: wrap;
+      opacity: 0; animation: fadeUp .6s .6s ease both;
+    }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 28px; border-radius: 8px; font-size: 14px; font-weight: 500;
+      text-decoration: none; transition: all .2s; cursor: pointer;
+      font-family: 'Inter', sans-serif;
+    }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: var(--accent2); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(14,165,233,.3); }
+    .btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+    .btn-ghost:hover { color: var(--text); border-color: var(--muted); transform: translateY(-2px); }
+
+    /* ── Scroll indicator ── */
+    .scroll-hint {
+      position: absolute; bottom: 40px; left: 64px;
+      font-family: 'JetBrains Mono', monospace; font-size: 10px;
+      letter-spacing: .2em; color: var(--muted); text-transform: uppercase;
+      display: flex; align-items: center; gap: 12px;
+      opacity: 0; animation: fadeUp .6s .9s ease both;
+    }
+    .scroll-hint::before { content: ''; width: 40px; height: 1px; background: var(--border); }
+
+    /* ── Stats bar ── */
+    .stats-bar {
+      border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+      background: var(--surface); padding: 24px 64px;
+      display: flex; gap: 0; overflow-x: auto;
+    }
+    .stat {
+      flex: 1; min-width: 140px; padding: 0 32px; border-right: 1px solid var(--border);
+      text-align: center;
+    }
+    .stat:last-child { border-right: none; }
+    .stat-val { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; color: var(--accent); }
+    .stat-val.gold { color: var(--gold); }
+    .stat-val.green { color: var(--green); }
+    .stat-val.purple { color: var(--purple); }
+    .stat-lbl { font-size: 11px; font-family: 'JetBrains Mono', monospace; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; margin-top: 4px; }
+
+    /* ── Section ── */
+    .section { max-width: 1200px; margin: 0 auto; padding: 80px 64px; }
+    .section-lbl {
+      font-family: 'JetBrains Mono', monospace; font-size: 10px;
+      letter-spacing: .28em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px;
+    }
+    .section-title { font-family: 'Syne', sans-serif; font-size: clamp(26px, 3vw, 40px); font-weight: 700; margin-bottom: 48px; }
+
+    /* ── Project Cards ── */
+    .projects { display: grid; gap: 24px; }
+    .proj-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+      overflow: hidden; display: grid; grid-template-columns: 1fr 1fr;
+      transition: border-color .25s, transform .25s, box-shadow .25s;
+      text-decoration: none; color: inherit;
+      position: relative;
+    }
+    .proj-card:hover { border-color: var(--accent); transform: translateY(-4px); box-shadow: 0 16px 48px rgba(0,0,0,.4); }
+    .proj-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      opacity: 0; transition: opacity .25s;
+    }
+    .proj-card:hover::before { opacity: 1; }
+    .proj-card.c1::before { background: linear-gradient(90deg, #f59e0b, #fcd34d); }
+    .proj-card.c2::before { background: linear-gradient(90deg, #1e6f5c, #2a9d7f); }
+    .proj-card.c3::before { background: linear-gradient(90deg, #0ea5e9, #38bdf8); }
+    .proj-card.c4::before { background: linear-gradient(90deg, #8b5cf6, #c4b5fd); }
+
+    .proj-content { padding: 40px; display: flex; flex-direction: column; }
+    .proj-num {
+      font-family: 'JetBrains Mono', monospace; font-size: 10px;
+      letter-spacing: .2em; color: var(--muted); text-transform: uppercase; margin-bottom: 16px;
+    }
+    .proj-badge {
+      display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 9px;
+      letter-spacing: .15em; text-transform: uppercase; padding: 4px 10px;
+      border-radius: 3px; margin-bottom: 16px;
+    }
+    .c1 .proj-badge { background: rgba(245,158,11,.12); color: var(--gold); border: 1px solid rgba(245,158,11,.25); }
+    .c2 .proj-badge { background: rgba(30,111,92,.12); color: #2a9d7f; border: 1px solid rgba(30,111,92,.25); }
+    .c3 .proj-badge { background: rgba(14,165,233,.12); color: var(--accent2); border: 1px solid rgba(14,165,233,.25); }
+    .c4 .proj-badge { background: rgba(139,92,246,.12); color: #a78bfa; border: 1px solid rgba(139,92,246,.25); }
+
+    .proj-title { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; margin-bottom: 12px; line-height: 1.2; }
+    .proj-desc { font-size: 14px; color: var(--muted); line-height: 1.7; margin-bottom: 24px; flex: 1; }
+    .proj-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; }
+    .proj-tag {
+      font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .05em;
+      padding: 3px 9px; border-radius: 3px; border: 1px solid var(--border); color: var(--muted);
+    }
+    .proj-link {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 13px; font-weight: 500; color: var(--accent);
+      text-decoration: none; transition: gap .2s;
+    }
+    .proj-link:hover { gap: 12px; }
+    .proj-link svg { width: 14px; height: 14px; }
+
+    .proj-visual {
+      background: var(--surface2); border-left: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      padding: 32px; min-height: 280px; position: relative; overflow: hidden;
+    }
+    .proj-visual-inner {
+      width: 100%; max-width: 320px; border-radius: 8px; overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0,0,0,.5); border: 1px solid var(--border);
+    }
+    .proj-visual-inner img { width: 100%; display: block; }
+
+    /* Placeholder visual for bid portfolio (no screenshot) */
+    .proj-visual-placeholder {
+      width: 100%; max-width: 280px; aspect-ratio: 16/10;
+      border-radius: 8px; border: 1px solid var(--border);
+      background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%);
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
+    }
+    .placeholder-icon { font-size: 36px; }
+    .placeholder-lbl { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: .1em; text-transform: uppercase; }
+
+    /* ── About strip ── */
+    .about-strip {
+      border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .about-inner {
+      max-width: 1200px; margin: 0 auto; padding: 64px;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center;
+    }
+    .about-text h2 { font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 700; margin-bottom: 16px; }
+    .about-text p { font-size: 15px; color: var(--muted); line-height: 1.8; margin-bottom: 14px; }
+    .about-links { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 28px; }
+    .about-link {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 13px; font-family: 'JetBrains Mono', monospace;
+      color: var(--muted); text-decoration: none; border: 1px solid var(--border);
+      padding: 8px 16px; border-radius: 6px; transition: all .2s;
+    }
+    .about-link:hover { color: var(--accent); border-color: var(--accent); }
+    .skills-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .skill-group { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
+    .sg-title { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: .2em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
+    .sg-items { display: flex; flex-wrap: wrap; gap: 6px; }
+    .sg-item { font-size: 11px; color: var(--muted); background: var(--surface); border: 1px solid var(--border); padding: 3px 8px; border-radius: 3px; font-family: 'JetBrains Mono', monospace; }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid var(--border); padding: 32px 64px;
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;
+    }
+    .footer-name { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: var(--text); }
+    .footer-links { display: flex; gap: 24px; }
+    .footer-links a { font-size: 12px; font-family: 'JetBrains Mono', monospace; color: var(--muted); text-decoration: none; letter-spacing: .05em; transition: color .2s; }
+    .footer-links a:hover { color: var(--accent); }
+
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    @media(max-width: 900px) {
+      .hero { padding: 60px 24px; }
+      .stats-bar { padding: 20px 24px; }
+      .section { padding: 60px 24px; }
+      .proj-card { grid-template-columns: 1fr; }
+      .proj-visual { display: none; }
+      .about-inner { grid-template-columns: 1fr; gap: 40px; padding: 40px 24px; }
+      footer { padding: 24px; flex-direction: column; align-items: flex-start; }
+      .scroll-hint { left: 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Hero ─────────────────────────────────────────────────────── -->
+<section class="hero">
+  <div class="grid-bg"></div>
+  <div class="hero-eyebrow">Data Analytics Portfolio</div>
+  <div class="hero-name">Anthony<br/><span>Orji</span></div>
+  <div class="hero-title">BI &amp; Data Analyst &mdash; <em>Revenue Operations</em></div>
+  <p class="hero-desc">6+ years building analytics systems that connect raw data to business outcomes — from Fabric lakehouses and Power BI dashboards to Smartsheet governance workflows and revenue operations pipelines.</p>
+  <div class="hero-tags">
+    <span class="htag gold">Microsoft Fabric</span>
+    <span class="htag">Power BI</span>
+    <span class="htag">SQL</span>
+    <span class="htag">Smartsheet</span>
+    <span class="htag green">Salesforce</span>
+    <span class="htag">DAX</span>
+    <span class="htag purple">Python / PySpark</span>
+    <span class="htag">Revenue Operations</span>
+  </div>
+  <div class="hero-cta">
+    <a href="#projects" class="btn btn-primary">View Case Studies ↓</a>
+    <a href="https://www.linkedin.com/in/caorji" target="_blank" class="btn btn-ghost">LinkedIn ↗</a>
+    <a href="https://novypro.com/profile_projects/chukwuemeka-anthony-orji" target="_blank" class="btn btn-ghost">NovyPro ↗</a>
+  </div>
+  <div class="scroll-hint">Scroll to explore</div>
+</section>
+
+<!-- ── Stats ─────────────────────────────────────────────────────── -->
+<div class="stats-bar">
+  <div class="stat"><div class="stat-val">6+</div><div class="stat-lbl">Years Experience</div></div>
+  <div class="stat"><div class="stat-val gold">$500K+</div><div class="stat-lbl">Payment Backlog Cleared</div></div>
+  <div class="stat"><div class="stat-val green">3</div><div class="stat-lbl">Case Studies</div></div>
+  <div class="stat"><div class="stat-val purple">9</div><div class="stat-lbl">Gold Fact Tables Built</div></div>
+  <div class="stat"><div class="stat-val">30+</div><div class="stat-lbl">Projects Tracked</div></div>
+</div>
+
+<!-- ── Projects ──────────────────────────────────────────────────── -->
+<div class="section" id="projects">
+  <div class="section-lbl">Case Studies</div>
+  <div class="section-title">Featured Work</div>
+
+  <div class="projects">
+
+    <!-- RevPipeline360 -->
+    <a href="https://chukwuemekaanthony.github.io/ChukwuemekaAnthony/revpipeline360/" class="proj-card c3" target="_blank">
+      <div class="proj-content">
+        <div class="proj-num">01</div>
+        <span class="proj-badge">Data Engineering</span>
+        <div class="proj-title">RevPipeline360 — Microsoft Fabric Lakehouse Build</div>
+        <p class="proj-desc">End-to-end Fabric analytics pipeline — Bronze/Silver/Gold medallion architecture, PySpark notebook transforms, Direct Lake semantic model, and a Power BI Revenue Intelligence dashboard tracking 1,200 leads with 82% win rate.</p>
+        <div class="proj-tags">
+          <span class="proj-tag">Microsoft Fabric</span>
+          <span class="proj-tag">PySpark</span>
+          <span class="proj-tag">Direct Lake</span>
+          <span class="proj-tag">DAX</span>
+          <span class="proj-tag">Power BI</span>
+          <span class="proj-tag">Star Schema</span>
+        </div>
+        <span class="proj-link">View Case Study <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></span>
+      </div>
+      <div class="proj-visual">
+        <div class="proj-visual-inner">
+          <img src="ChukwuemekaAnthony/revpipeline360/Revpipeline_Dashboard.png" alt="RevPipeline360 Dashboard" onerror="this.parentElement.innerHTML='<div class=\'proj-visual-placeholder\'><div class=\'placeholder-icon\'>⚡</div><div class=\'placeholder-lbl\'>RevPipeline360</div></div>'"/>
+        </div>
+      </div>
+    </a>
+
+    <!-- PMO EVM -->
+    <a href="https://chukwuemekaanthony.github.io/ChukwuemekaAnthony/case-studies/" class="proj-card c1" target="_blank">
+      <div class="proj-content">
+        <div class="proj-num">02</div>
+        <span class="proj-badge">PMO Analytics</span>
+        <div class="proj-title">PMO Performance &amp; EVM Architecture</div>
+        <p class="proj-desc">Governed reference architecture for portfolio performance intelligence spanning BQE Core, Smartsheet, and Power BI. Built a 30-project EVM tracker with CPI/SPI/EAC/ETC metrics and executive dashboard — cutting project expense 7%.</p>
+        <div class="proj-tags">
+          <span class="proj-tag">Power BI</span>
+          <span class="proj-tag">Smartsheet</span>
+          <span class="proj-tag">BQE Core</span>
+          <span class="proj-tag">EVM</span>
+          <span class="proj-tag">DAX</span>
+        </div>
+        <span class="proj-link">View Case Study <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></span>
+      </div>
+      <div class="proj-visual">
+        <div class="proj-visual-inner">
+          <img src="ChukwuemekaAnthony/case-studies/PMO_EVM_.jpg" alt="PMO EVM Dashboard" onerror="this.parentElement.innerHTML='<div class=\'proj-visual-placeholder\'><div class=\'placeholder-icon\'>📊</div><div class=\'placeholder-lbl\'>PMO EVM</div></div>'"/>
+        </div>
+      </div>
+    </a>
+
+    <!-- Contract to Cash -->
+    <a href="https://chukwuemekaanthony.github.io/ChukwuemekaAnthony/contract-to-cash/" class="proj-card c2" target="_blank">
+      <div class="proj-content">
+        <div class="proj-num">03</div>
+        <span class="proj-badge">Revenue Operations</span>
+        <div class="proj-title">Contract-to-Cash Lifecycle Architecture</div>
+        <p class="proj-desc">Stage-gated C2C tracker integrating Salesforce and Smartsheet across Sales, Finance, and Operations. Cleared $500K+ in payment backlog through automated milestone tracking, role-based routing, and executive pipeline dashboards.</p>
+        <div class="proj-tags">
+          <span class="proj-tag">Salesforce</span>
+          <span class="proj-tag">Smartsheet</span>
+          <span class="proj-tag">Power BI</span>
+          <span class="proj-tag">Revenue Ops</span>
+          <span class="proj-tag">Stage Gates</span>
+        </div>
+        <span class="proj-link">View Case Study <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></span>
+      </div>
+      <div class="proj-visual">
+        <div class="proj-visual-inner">
+          <img src="ChukwuemekaAnthony/contract-to-cash/contract_cash_dashboard.png" alt="Contract to Cash Dashboard" onerror="this.parentElement.innerHTML='<div class=\'proj-visual-placeholder\'><div class=\'placeholder-icon\'>💰</div><div class=\'placeholder-lbl\'>Contract to Cash</div></div>'"/>
+        </div>
+      </div>
+    </a>
+
+    <!-- Bid Portfolio App -->
+    <a href="https://chukwuemekaanthony.github.io/bid-portfolio-app/" class="proj-card c4" target="_blank">
+      <div class="proj-content">
+        <div class="proj-num">04</div>
+        <span class="proj-badge">Web Application</span>
+        <div class="proj-title">Bid Portfolio App — Go/No-Go Engine</div>
+        <p class="proj-desc">Live web app built with HTML, Azure MSAL authentication, and OneDrive-hosted Excel backend. Tracks bid decisions with a Go/No-Go scoring engine, pipeline dashboard, and Microsoft 365 integration.</p>
+        <div class="proj-tags">
+          <span class="proj-tag">Azure MSAL</span>
+          <span class="proj-tag">OneDrive API</span>
+          <span class="proj-tag">HTML/JS</span>
+          <span class="proj-tag">Excel</span>
+          <span class="proj-tag">Power Platform</span>
+        </div>
+        <span class="proj-link">Launch App <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></span>
+      </div>
+      <div class="proj-visual">
+        <div class="proj-visual-placeholder">
+          <div class="placeholder-icon">🚀</div>
+          <div class="placeholder-lbl">Live Application</div>
+        </div>
+      </div>
+    </a>
+
+  </div>
+</div>
+
+<!-- ── About ─────────────────────────────────────────────────────── -->
+<div class="about-strip">
+  <div class="about-inner">
+    <div class="about-text">
+      <h2>About Me</h2>
+      <p>Data Analyst and BI professional based in Chicago with 6+ years of experience in analytics, revenue operations, and cross-functional delivery. I build systems that turn operational data into actionable intelligence.</p>
+      <p>My work spans the full analytics stack — from lakehouse architecture and ETL pipelines to governance workflows, executive dashboards, and business process automation.</p>
+      <div class="about-links">
+        <a href="mailto:emekaorji101@gmail.com" class="about-link">✉ emekaorji101@gmail.com</a>
+        <a href="https://www.linkedin.com/in/caorji" target="_blank" class="about-link">LinkedIn ↗</a>
+        <a href="https://novypro.com/profile_projects/chukwuemeka-anthony-orji" target="_blank" class="about-link">NovyPro ↗</a>
+      </div>
+    </div>
+    <div class="skills-grid">
+      <div class="skill-group">
+        <div class="sg-title">BI &amp; Visualization</div>
+        <div class="sg-items">
+          <span class="sg-item">Power BI</span><span class="sg-item">DAX</span>
+          <span class="sg-item">Tableau</span><span class="sg-item">Direct Lake</span>
+        </div>
+      </div>
+      <div class="skill-group">
+        <div class="sg-title">Data Engineering</div>
+        <div class="sg-items">
+          <span class="sg-item">MS Fabric</span><span class="sg-item">PySpark</span>
+          <span class="sg-item">SQL</span><span class="sg-item">Python</span>
+        </div>
+      </div>
+      <div class="skill-group">
+        <div class="sg-title">Platforms</div>
+        <div class="sg-items">
+          <span class="sg-item">Smartsheet</span><span class="sg-item">Salesforce</span>
+          <span class="sg-item">HubSpot</span><span class="sg-item">BQE Core</span>
+        </div>
+      </div>
+      <div class="skill-group">
+        <div class="sg-title">Automation</div>
+        <div class="sg-items">
+          <span class="sg-item">Power Apps</span><span class="sg-item">Power Automate</span>
+          <span class="sg-item">Data Shuttle</span><span class="sg-item">Azure</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Footer ─────────────────────────────────────────────────────── -->
+<footer>
+  <div class="footer-name">Anthony Orji &mdash; Data Analytics Portfolio</div>
+  <div class="footer-links">
+    <a href="mailto:emekaorji101@gmail.com">Email</a>
+    <a href="https://www.linkedin.com/in/caorji" target="_blank">LinkedIn</a>
+    <a href="https://novypro.com/profile_projects/chukwuemeka-anthony-orji" target="_blank">NovyPro</a>
+    <a href="https://github.com/chukwuemekaanthony" target="_blank">GitHub</a>
+  </div>
+</footer>
+
+</body>
+</html>
