@@ -107,6 +107,35 @@
     .impact-text h3 { font-size: 17px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
     .impact-text p { font-size: 14px; color: var(--muted); max-width: 540px; }
 
+    /* ── Role Strip ── */
+    .role-strip {
+      background: linear-gradient(135deg, #0a1628 0%, #0d1f38 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 36px 48px;
+      position: relative; overflow: hidden;
+    }
+    .role-strip::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--purple), var(--gold));
+    }
+    .role-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: auto 1fr; gap: 32px; align-items: start; }
+    .role-label-col { display: flex; flex-direction: column; align-items: center; gap: 8px; padding-top: 2px; }
+    .role-icon { font-size: 28px; }
+    .role-tag {
+      font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: .2em;
+      text-transform: uppercase; color: var(--accent); writing-mode: vertical-rl;
+      transform: rotate(180deg); white-space: nowrap;
+    }
+    .role-content h3 { font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 700; color: var(--text); margin-bottom: 10px; }
+    .role-content p { font-size: 14px; color: #94a3b8; line-height: 1.75; margin-bottom: 0; max-width: 860px; }
+    .role-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+    .role-pill {
+      font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .06em;
+      padding: 4px 12px; border-radius: 4px; border: 1px solid rgba(14,165,233,.25);
+      color: var(--accent2); background: rgba(14,165,233,.06);
+    }
+    @media(max-width:640px){ .role-strip{ padding: 24px 20px; } .role-inner{ grid-template-columns: 1fr; } .role-label-col{ flex-direction: row; } .role-tag{ writing-mode: horizontal-tb; transform: none; } }
+
     /* ── KPI Strip ── */
     .kpi-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-bottom: 44px; }
     .kpi {
@@ -245,6 +274,28 @@
   <a href="#diagram">Flow Diagram</a>
   <a href="#checklist">Checklist</a>
 </nav>
+
+<div class="role-strip">
+  <div class="role-inner">
+    <div class="role-label-col">
+      <div class="role-icon">⚡</div>
+      <div class="role-tag">My Role</div>
+    </div>
+    <div class="role-content">
+      <h3>Lead Architect &amp; Full-Stack Builder</h3>
+      <p>I led the end-to-end design and implementation of RevPipeline360 — from defining the medallion architecture and writing every PySpark transform, to configuring the pipeline, building the Direct Lake semantic model, designing the DAX measure library, and delivering the Power BI Revenue Intelligence report. Requirements were gathered directly from business stakeholders across Sales and Finance, and all technical decisions — including the relationship strategy, attribution pattern, and pipeline hardening approach — were made and executed independently.</p>
+      <div class="role-pills">
+        <span class="role-pill">Architecture Design</span>
+        <span class="role-pill">PySpark / SQL Transforms</span>
+        <span class="role-pill">Pipeline Orchestration</span>
+        <span class="role-pill">Semantic Model Build</span>
+        <span class="role-pill">DAX Measure Library</span>
+        <span class="role-pill">Power BI Report Design</span>
+        <span class="role-pill">Stakeholder Requirements</span>
+      </div>
+    </div>
+  </div>
+</div>
 
 <main>
 
