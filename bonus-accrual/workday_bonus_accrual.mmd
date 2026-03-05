@@ -1,0 +1,106 @@
+flowchart TD
+
+  %% ── MODULE 1: TIME TRACKING ─────────────────────────────────
+  subgraph M1["MODULE 1 — TIME TRACKING"]
+    direction TB
+    TT1["Time Tracking\nConsultant Time Entry"]
+    TT2["Time Tracking\nTime Entry Type Tagging\nBillable vs Non-Billable"]
+    TT3["Time Tracking\nManager / Supervisor Approval\nApproval Workflow"]
+    ABT["Approved Billable Time Blocks\nTagged to Project & Worktag Hierarchy"]
+
+    TT1 --> ABT
+    TT2 --> ABT
+    TT3 --> ABT
+  end
+
+  %% ── MODULE 2: PROJECT BILLING & RESOURCE MGMT ───────────────
+  subgraph M2["MODULE 2 — PROJECT BILLING & RESOURCE MANAGEMENT"]
+    direction TB
+    BR["Project Billing\nBilling Rules Applied\nRate caps, RTE ceilings, client approval"]
+    BT["Project Billing\nBilling Transactions Generated\nWrite-offs → Recognized Revenue"]
+    RR["REALIZATION RATE\nApproved Hrs ÷ Submitted Hrs"]
+
+    SH["Resource Management\nScheduled Hours from Position Record\nMinus approved Absence/PTO"]
+    AHD["Time Tracking / HCM\nAvailable Hours Denominator\nGovernance: PTO exclusion logic"]
+    UR["UTILIZATION RATE\nBillable Hrs ÷ Available Hrs"]
+
+    BR --> BT --> RR
+    SH --> AHD --> UR
+  end
+
+  %% ── MODULE 3: COMPOSITE PRODUCTIVITY SCORING ────────────────
+  subgraph M3["MODULE 3 — COMPOSITE PRODUCTIVITY SCORING"]
+    direction TB
+    CPS["COMPOSITE PRODUCTIVITY SCORE\nExample: 0.80 utilization × 0.875 realization = 0.70\n70% of available time converts to revenue"]
+    PT["Composite Score → Performance Tier Assignment\nThresholds defined by Finance & HR"]
+
+    CPS --> PT
+  end
+
+  %% ── MODULE 4: HCM COMPENSATION PLAN ─────────────────────────
+  subgraph M4["MODULE 4 — HCM COMPENSATION PLAN"]
+    direction TB
+    CP["HCM Compensation\nCompensation Plan\nBonus Plan with Eligibility Rules"]
+    CGP["HCM Compensation\nCompensation Grade Profile\nBonus Tier / Payout Level"]
+    ER["Eligibility Rule Evaluation\nGrade, tenure, rating, productivity tier"]
+    PS["Payout Structure Applied\nFlat / Tiered / Formula-based"]
+    EBL["ESTIMATED BONUS LIABILITY PER CONSULTANT\nCalculated monthly per performance period"]
+
+    CP --> ER
+    CGP --> PS
+    ER --> EBL
+    PS --> EBL
+  end
+
+  %% ── MODULE 5: FINANCIAL ACCOUNTING ──────────────────────────
+  subgraph M5["MODULE 5 — FINANCIAL ACCOUNTING & ADAPTIVE PLANNING"]
+    direction TB
+    PEA["Financial Accounting\nPeriod End Accrual Journal\nDebit: Bonus Expense / Credit: Accrued Comp"]
+    WAP["Adaptive Planning\nWorkday Adaptive Planning\nForecasts full-year bonus liability"]
+    LA["Financial Accounting\nLiability Account Updated\nAccrued Compensation — Balance Sheet"]
+    BVA["Adaptive Planning\nBudget vs Actual Comparison\nActuals from Financials Ledger + Adaptive"]
+    PAC["Period Accrual Adjusted or Confirmed by Finance"]
+
+    PEA --> LA --> PAC
+    WAP --> BVA --> PAC
+  end
+
+  %% ── OUTPUT ───────────────────────────────────────────────────
+  subgraph OUT["OUTPUT — FINANCE & HR REPORTING"]
+    direction LR
+    FR["Finance Report\nAccrual liability + variance vs budget"]
+    HRC["HR Compensation Tracking\nRunning payout obligation by employee"]
+    ED["Executive Dashboard\nPortfolio productivity + comp liability"]
+  end
+
+  %% ── CROSS-MODULE CONNECTIONS ─────────────────────────────────
+  ABT --> BR
+  ABT --> SH
+  RR  --> CPS
+  UR  --> CPS
+  PT  --> CP
+  PT  --> CGP
+  EBL --> PEA
+  EBL --> WAP
+  PAC --> FR
+  PAC --> HRC
+  PAC --> ED
+
+  %% ── STYLES ───────────────────────────────────────────────────
+  classDef module1  fill:#dbeafe,stroke:#3b82f6,color:#1e3a5f
+  classDef module2  fill:#dcfce7,stroke:#16a34a,color:#14532d
+  classDef module3  fill:#ede9fe,stroke:#7c3aed,color:#3b0764
+  classDef module4  fill:#fef9c3,stroke:#ca8a04,color:#713f12
+  classDef module5  fill:#fee2e2,stroke:#dc2626,color:#7f1d1d
+  classDef output   fill:#f0fdf4,stroke:#15803d,color:#14532d
+  classDef keynode  fill:#6d28d9,stroke:#4c1d95,color:#fff,font-weight:bold
+
+  class TT1,TT2,TT3,ABT module1
+  class BR,BT,SH,AHD module2
+  class RR,UR module2
+  class CPS,PT keynode
+  class CP,CGP,ER,PS module4
+  class EBL keynode
+  class PEA,WAP,LA,BVA module5
+  class PAC keynode
+  class FR,HRC,ED output
