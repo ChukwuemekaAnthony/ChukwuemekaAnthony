@@ -1,0 +1,19 @@
+
+flowchart LR
+
+Opportunity --> EconomicReview
+
+EconomicReview --> RevenueAssessment
+EconomicReview --> CostAssessment
+EconomicReview --> RiskAssessment
+EconomicReview --> WinProbability
+
+RevenueAssessment --> Decision
+CostAssessment --> Decision
+RiskAssessment --> Decision
+WinProbability --> Decision
+
+Decision -->|Pursue| BidPortfolio
+Decision -->|Decline| Exit
+
+BidPortfolio --> StrategicGrowth

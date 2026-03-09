@@ -1,0 +1,23 @@
+
+flowchart TD
+
+Opportunity[Contract Opportunity]
+
+Opportunity --> RevenuePotential
+Opportunity --> CostStructure
+Opportunity --> RiskProfile
+Opportunity --> WinProbability
+Opportunity --> CapitalExposure
+
+RevenuePotential --> EconomicEvaluation
+CostStructure --> EconomicEvaluation
+RiskProfile --> EconomicEvaluation
+WinProbability --> EconomicEvaluation
+CapitalExposure --> EconomicEvaluation
+
+EconomicEvaluation --> BidDecision
+
+BidDecision -->|Pursue| BidPortfolio
+BidDecision -->|Decline| ExitOpportunity
+
+BidPortfolio --> StrategicRevenue
