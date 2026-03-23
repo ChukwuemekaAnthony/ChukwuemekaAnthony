@@ -183,6 +183,26 @@
     .c3 .proj-badge { background: rgba(201,138,46,.12); color: var(--accent2); border: 1px solid rgba(201,138,46,.25); }
     .c4 .proj-badge { background: rgba(139,92,246,.12); color: #a78bfa; border: 1px solid rgba(139,92,246,.25); }
 
+    /* ── Problem / Solution strip on cards ── */
+    .proj-ps {
+      margin-bottom: 18px;
+      border-left: 2px solid var(--border);
+      padding-left: 14px;
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .proj-problem {
+      font-size: 12px; color: #e05a2b; font-weight: 500;
+      display: flex; gap: 7px; align-items: flex-start; line-height: 1.5;
+    }
+    .proj-solution {
+      font-size: 12px; color: var(--green); font-weight: 500;
+      display: flex; gap: 7px; align-items: flex-start; line-height: 1.5;
+    }
+    .ps-label {
+      font-size: 9px; letter-spacing: .12em; text-transform: uppercase;
+      font-weight: 600; opacity: .7; flex-shrink: 0; padding-top: 2px;
+    }
+
     .proj-title { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; margin-bottom: 12px; line-height: 1.2; }
     .proj-desc { font-size: 14px; color: var(--muted); line-height: 1.7; margin-bottom: 24px; flex: 1; }
     .proj-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; }
@@ -302,6 +322,10 @@
     .en-icon { font-size: 24px; margin-bottom: 8px; }
     .en-title { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px; line-height: 1.3; }
     .en-sub { font-size: 11px; color: var(--muted); margin-bottom: 10px; letter-spacing: .02em; }
+    .en-solve {
+      font-size: 11px; color: var(--muted); font-style: italic;
+      line-height: 1.4; margin-bottom: 8px; max-width: 280px;
+    }
     .en-impact {
       font-size: 11px; color: var(--accent); font-weight: 500;
       background: rgba(201,138,46,.08); border: 1px solid rgba(201,138,46,.18);
@@ -427,6 +451,7 @@
           <div class="en-icon">🏭</div>
           <div class="en-title">CAO Bid Intelligence</div>
           <div class="en-sub">Commercial Analytics</div>
+          <div class="en-solve">Stops margin-destroying bids before they go out</div>
           <div class="en-impact">15 Go/No-Go rules · Margin-first bidding</div>
           <div class="en-arrow-down"></div>
         </div>
@@ -439,6 +464,7 @@
           <div class="en-icon">🔗</div>
           <div class="en-title">CRM Revenue Lifecycle</div>
           <div class="en-sub">HubSpot Deal-to-Cash Architecture</div>
+          <div class="en-solve">Unifies siloed CRM, finance &amp; ops into one revenue lineage</div>
           <div class="en-impact">35 KPIs · deal_id propagates end-to-end</div>
           <div class="en-arrow-down"></div>
         </div>
@@ -451,6 +477,7 @@
           <div class="en-icon">💰</div>
           <div class="en-title">Contract-to-Cash</div>
           <div class="en-sub">Revenue Operations</div>
+          <div class="en-solve">Converts signed contracts into collected cash — faster</div>
           <div class="en-impact">$500K+ backlog cleared · Stage-gated AR</div>
           <div class="en-arrow-down"></div>
         </div>
@@ -460,6 +487,7 @@
           <div class="en-icon">📊</div>
           <div class="en-title">PMO EVM Architecture</div>
           <div class="en-sub">Portfolio Performance</div>
+          <div class="en-solve">Makes margin erosion visible before it becomes a loss</div>
           <div class="en-impact">7% cost reduction · 30 projects tracked</div>
           <div class="en-arrow-down"></div>
         </div>
@@ -470,8 +498,9 @@
         <div class="ent-node en-bonus">
           <div class="en-num">04</div>
           <div class="en-icon">💼</div>
-          <div class="en-title">Bonus Accrual & Workday</div>
+          <div class="en-title">Bonus Accrual &amp; Workday</div>
           <div class="en-sub">Finance Operations</div>
+          <div class="en-solve">Eliminates year-end P&amp;L surprises from manual comp calculations</div>
           <div class="en-impact">Year-end P&amp;L corrections eliminated</div>
           <div class="en-arrow-down en-arrow-gold"></div>
         </div>
@@ -485,6 +514,7 @@
           <div class="en-icon">⚡</div>
           <div class="en-title">RevPipeline360 · Microsoft Fabric Lakehouse</div>
           <div class="en-sub">Bronze → Silver → Gold · Direct Lake · Power BI</div>
+          <div class="en-solve">Turns fragmented revenue data into a single governed intelligence layer — real-time, sub-second</div>
           <div class="en-impact">9 Gold fact tables · 5 dims · 82% win rate tracked · Sub-second refresh</div>
         </div>
       </div>
@@ -513,7 +543,11 @@
         <div class="proj-num">01</div>
         <span class="proj-badge">Data Engineering</span>
         <div class="proj-title">RevPipeline360 — Microsoft Fabric Lakehouse Build</div>
-        <p class="proj-desc">End-to-end Fabric analytics pipeline — Bronze/Silver/Gold medallion architecture, PySpark notebook transforms, Direct Lake semantic model, and a Power BI Revenue Intelligence dashboard tracking 1,200 leads with 82% win rate.</p>
+        <div class="proj-ps">
+          <div class="proj-problem"><span class="ps-label">Problem</span> Revenue visibility is fragmented across disconnected sources — no single view of pipeline health, win rates, or forecast accuracy.</div>
+          <div class="proj-solution"><span class="ps-label">Solution</span> A Bronze→Silver→Gold Fabric lakehouse with Direct Lake semantic model delivering a unified revenue intelligence layer — real-time, sub-second refresh.</div>
+        </div>
+        <p class="proj-desc">End-to-end Fabric analytics pipeline — medallion architecture, PySpark notebook transforms, Direct Lake semantic model, and a Power BI Revenue Intelligence dashboard tracking 1,200 leads with 82% win rate.</p>
         <div class="proj-tags">
           <span class="proj-tag">Microsoft Fabric</span>
           <span class="proj-tag">PySpark</span>
@@ -537,7 +571,11 @@
         <div class="proj-num">02</div>
         <span class="proj-badge">PMO Analytics</span>
         <div class="proj-title">PMO Performance &amp; EVM Architecture</div>
-        <p class="proj-desc">Governed reference architecture for portfolio performance intelligence spanning BQE Core, Smartsheet, and Power BI. Built a 30-project EVM tracker with CPI/SPI/EAC/ETC metrics and executive dashboard — cutting project expense 7%.</p>
+        <div class="proj-ps">
+          <div class="proj-problem"><span class="ps-label">Problem</span> Projects bleed margin silently — cost overruns are invisible until finance closes the books, too late to act.</div>
+          <div class="proj-solution"><span class="ps-label">Solution</span> A governed EVM architecture across 30 projects surfacing CPI, SPI, EAC, and ETC in real time — cutting project expense 7% through early visibility.</div>
+        </div>
+        <p class="proj-desc">Governed reference architecture for portfolio performance intelligence spanning BQE Core, Smartsheet, and Power BI. Built a 30-project EVM tracker with CPI/SPI/EAC/ETC metrics and executive dashboard.</p>
         <div class="proj-tags">
           <span class="proj-tag">Power BI</span>
           <span class="proj-tag">Smartsheet</span>
@@ -560,6 +598,10 @@
         <div class="proj-num">03</div>
         <span class="proj-badge">Revenue Operations</span>
         <div class="proj-title">Contract-to-Cash Lifecycle Architecture</div>
+        <div class="proj-ps">
+          <div class="proj-problem"><span class="ps-label">Problem</span> Signed contracts stall between teams — milestones go unbilled, invoices age, and cash sits uncollected while everyone assumes someone else is tracking it.</div>
+          <div class="proj-solution"><span class="ps-label">Solution</span> A stage-gated C2C tracker enforcing billing milestones across Sales, Finance, and Operations — clearing $500K+ in payment backlog through automated routing and executive pipeline visibility.</div>
+        </div>
         <p class="proj-desc">Stage-gated C2C tracker integrating Salesforce and Smartsheet across Sales, Finance, and Operations. Cleared $500K+ in payment backlog through automated milestone tracking, role-based routing, and executive pipeline dashboards.</p>
         <div class="proj-tags">
           <span class="proj-tag">Salesforce</span>
@@ -582,8 +624,12 @@
       <div class="proj-content">
         <div class="proj-num">04</div>
         <span class="proj-badge">Finance Operations</span>
-        <div class="proj-title">Bonus Accrual Architecture & Workday Mapping</div>
-        <p class="proj-desc">Incentive compensation platform built with Power Apps, Power Automate, and Dataverse. Composite productivity scoring engine (utilization × realization), tier-based multiplier logic, and monthly Finance reporting extract — eliminating year-end P&L corrections. Fully mapped to Workday HCM, Financials, and Adaptive Planning.</p>
+        <div class="proj-title">Bonus Accrual Architecture &amp; Workday Mapping</div>
+        <div class="proj-ps">
+          <div class="proj-problem"><span class="ps-label">Problem</span> Incentive compensation is calculated manually and late — causing year-end P&amp;L surprises and reconciliation chaos across HR, Finance, and operations.</div>
+          <div class="proj-solution"><span class="ps-label">Solution</span> A Power Apps + Dataverse scoring engine with tier-based multiplier logic and a monthly Finance extract — eliminating year-end corrections entirely, fully mapped to Workday.</div>
+        </div>
+        <p class="proj-desc">Incentive compensation platform built with Power Apps, Power Automate, and Dataverse. Composite productivity scoring engine (utilization × realization), tier-based multiplier logic, and monthly Finance reporting extract — eliminating year-end P&amp;L corrections. Fully mapped to Workday HCM, Financials, and Adaptive Planning.</p>
         <div class="proj-tags">
           <span class="proj-tag">Power Apps</span>
           <span class="proj-tag">Power Automate</span>
@@ -609,7 +655,11 @@
         <div class="proj-num">05</div>
         <span class="proj-badge">Web Application &nbsp;&middot;&nbsp; Industrial Services</span>
         <div class="proj-title">CAO Bid Portfolio — Industrial Bid Intelligence Engine</div>
-        <p class="proj-desc">React 18 SPA with a two-layer contract economics engine purpose-built for industrial services outsourcing. Evaluates bid viability across 15 deterministic Go/No-Go rules — incorporating adjusted margin, byproduct commodity sensitivity, pursuit cost ROI, site audit gate, and capacity concurrency monitoring. Backed by Microsoft Graph API and OneDrive Excel with no server infrastructure.</p>
+        <div class="proj-ps">
+          <div class="proj-problem"><span class="ps-label">Problem</span> Industrial services firms win the wrong contracts — chasing bids on gut feel, underpricing risk, and discovering margin problems only after mobilisation.</div>
+          <div class="proj-solution"><span class="ps-label">Solution</span> A React bid intelligence engine enforcing 15 Go/No-Go rules across adjusted margin, commodity sensitivity, pursuit ROI, and capacity — before a bid goes out the door.</div>
+        </div>
+        <p class="proj-desc">React 18 SPA with a two-layer contract economics engine purpose-built for industrial services outsourcing. Evaluates bid viability across 15 deterministic Go/No-Go rules — incorporating adjusted margin, byproduct commodity sensitivity, pursuit cost ROI, site audit gate, and capacity concurrency monitoring.</p>
         <div class="proj-tags">
           <span class="proj-tag">React 18</span>
           <span class="proj-tag">Azure MSAL</span>
@@ -635,7 +685,11 @@
         <div class="proj-num">06</div>
         <span class="proj-badge">Data Architecture &nbsp;&middot;&nbsp; Revenue Operations</span>
         <div class="proj-title">CRM Revenue Lifecycle Architecture — HubSpot Deal-to-Cash</div>
-        <p class="proj-desc">Enterprise-grade data architecture connecting HubSpot CRM commercial pipeline to operational delivery, service execution, billing, and profitability analytics. Full revenue lineage from a single originating deal_id through contract, asset, invoice, cost, and margin — with a 35-KPI catalog spanning sales pipeline, contract performance, asset lifecycle, service operations, and profitability. Star schema with 4 grain-declared fact tables, 7 SCD-typed dimensions, and complete warehouse governance documentation.</p>
+        <div class="proj-ps">
+          <div class="proj-problem"><span class="ps-label">Problem</span> Revenue data lives in silos — CRM, finance, and operations each tell a different story with no shared lineage from deal to cash.</div>
+          <div class="proj-solution"><span class="ps-label">Solution</span> An enterprise data architecture propagating a single deal_id from commercial close through contract, delivery, billing, and cash — with a 35-KPI catalog and full warehouse governance.</div>
+        </div>
+        <p class="proj-desc">Enterprise-grade data architecture connecting HubSpot CRM commercial pipeline to operational delivery, billing, and profitability analytics. Full revenue lineage from deal_id through contract, asset, invoice, cost, and margin — star schema with 4 grain-declared fact tables, 7 SCD-typed dimensions, and complete warehouse governance documentation.</p>
         <div class="proj-tags">
           <span class="proj-tag">HubSpot CRM</span>
           <span class="proj-tag">Star Schema</span>
