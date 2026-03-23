@@ -13,6 +13,26 @@
     body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-weight:300;line-height:1.7;min-height:100vh}
     header{position:relative;padding:72px 48px 80px;border-bottom:1px solid var(--border);background:linear-gradient(150deg,#0f3d30 0%,#1e6f5c 60%,#2a9d7f 100%);overflow:hidden}
     header::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:48px;background:var(--bg);clip-path:ellipse(55% 100% at 50% 100%)}
+    .header-inner{display:grid;grid-template-columns:1fr auto;gap:48px;align-items:center;position:relative;z-index:1}
+    .header-text{}
+    .header-visual{flex-shrink:0}
+    .header-img-wrap{
+      border-radius:8px;overflow:hidden;
+      border:1px solid rgba(255,255,255,.15);
+      box-shadow:0 16px 48px rgba(0,0,0,.4);
+      max-width:520px;
+    }
+    .header-img-wrap img{width:100%;display:block;}
+    .img-caption{
+      background:rgba(0,0,0,.35);
+      padding:8px 14px;
+      font-family:'JetBrains Mono',monospace;
+      font-size:10px;
+      letter-spacing:.1em;
+      text-transform:uppercase;
+      color:rgba(255,255,255,.55);
+      border-top:1px solid rgba(255,255,255,.1);
+    }
     .eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.6);margin-bottom:16px;display:flex;align-items:center;gap:10px}
     .eyebrow::before{content:'';display:inline-block;width:28px;height:1px;background:rgba(255,255,255,.4)}
     h1{font-family:'DM Serif Display',serif;font-size:clamp(30px,4.5vw,54px);font-weight:400;line-height:1.15;color:#fff;max-width:780px;margin-bottom:16px}
@@ -82,6 +102,10 @@
     .role-content p{font-size:14px;color:#94a3b8;line-height:1.75;margin-bottom:0;max-width:860px}
     .role-pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
     .role-pill{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.06em;padding:4px 12px;border-radius:4px;border:1px solid rgba(42,157,127,.3);color:#2a9d7f;background:rgba(42,157,127,.07)}
+    @media(max-width:900px){
+      .header-inner{grid-template-columns:1fr}
+      .header-visual{display:none}
+    }
     @media(max-width:640px){header,main,nav,footer{padding-left:20px;padding-right:20px}.doc{padding:24px 20px}.pdf-frame{height:500px}.impact{padding:24px}.impact-num{font-size:40px}.role-strip{padding:24px 20px}.role-inner{grid-template-columns:1fr}.role-label-col{flex-direction:row}.role-tag{writing-mode:horizontal-tb;transform:none}}
     @keyframes fu{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
     header{animation:fu .5s ease both}
@@ -89,11 +113,21 @@
 </head>
 <body>
 <header>
-  <div class="eyebrow">Case Study - Revenue Operations</div>
-  <h1>Contract-to-Cash <em>Lifecycle Architecture</em></h1>
-  <p class="hdesc">A stage-gated, governed C2C tracker integrating Salesforce and Smartsheet - clearing over $500K in payment backlog across Sales, Finance, and Operations.</p>
-  <div class="meta">
-    <span class="tag hi">Salesforce</span><span class="tag hi">Smartsheet</span><span class="tag">Power BI</span><span class="tag">Revenue Operations</span><span class="tag">Stage-Gated Governance</span><span class="tag">Power Platform</span>
+  <div class="header-inner">
+    <div class="header-text">
+      <div class="eyebrow">Case Study - Revenue Operations</div>
+      <h1>Contract-to-Cash <em>Lifecycle Architecture</em></h1>
+      <p class="hdesc">A stage-gated, governed C2C tracker integrating Salesforce and Smartsheet - clearing over $500K in payment backlog across Sales, Finance, and Operations.</p>
+      <div class="meta">
+        <span class="tag hi">Salesforce</span><span class="tag hi">Smartsheet</span><span class="tag">Power BI</span><span class="tag">Revenue Operations</span><span class="tag">Stage-Gated Governance</span><span class="tag">Power Platform</span>
+      </div>
+    </div>
+    <div class="header-visual">
+      <div class="header-img-wrap">
+        <img src="contract_cash_analytics_lineage.jpg" alt="Contract-to-Cash Revenue Analytics Lineage"/>
+        <div class="img-caption">Revenue Analytics Lineage · deal_id propagates end-to-end</div>
+      </div>
+    </div>
   </div>
 </header>
 <nav id="nav">
